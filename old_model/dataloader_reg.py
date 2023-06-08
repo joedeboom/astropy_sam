@@ -1,5 +1,5 @@
 # Import necessary libraries
-from utils.data_utils import *
+from old_model.utils.data_utils import *
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
