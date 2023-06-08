@@ -38,7 +38,7 @@ class Cropped_Image():
     def get_type(self):
         return self.type
     def __str__(self) -> str:
-        s = 'ID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box)
+        s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box)
         return s
     def generate_boundary(self) -> None:
         # Define a function to generate the cropped images to pass into the model.
