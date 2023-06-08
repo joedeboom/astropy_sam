@@ -17,8 +17,13 @@ image_shape = 16740
 # Define the crop image ID index
 #crop_id = 0
 
+"""
+# Defina a cropped image holder class
+def Image_Holder():
+    def __init__(self) -> None:
+"""
 
-# Define a class to store cropped images
+# Define a cropped image class
 class Cropped_Image():
     index = 0
     def __init__(self, cen, file_type) -> None:
@@ -31,6 +36,7 @@ class Cropped_Image():
         # Define the image id
         self.id = Cropped_Image.index
         Cropped_Image.index += 1
+        self.image = None
     def get_center(self):
         return self.center
     def get_box(self):
@@ -40,6 +46,8 @@ class Cropped_Image():
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box)
         return s
+    def set_image(self, img) -> None:
+        self.image = img.copy()
     def generate_boundary(self) -> None:
         # Define a function to generate the cropped images to pass into the model.
         # Input: the center coordinates of the region to be cropped
@@ -95,7 +103,7 @@ def contains_image(fi):
 
 # Returns a list of (x,y) coordinates
 # reference annotate_reg in dataloader_reg to see how to annotate in easily in this function.
-def gen_images(files, file_type):
+def gen_crops(files, file_type):
     imgs = []
     for file in files:
         regions = Regions.read(file, format='ds9')
@@ -119,7 +127,14 @@ def gen_images(files, file_type):
         imgs.append(Cropped_Image(center, file_type))
     return imgs
 
-
+def generate_images(path, img_hold):
+    img_data = fits2matrix(path)[0][0]
+    img_data[np.isnan(img_data)] = -1
+    for image in img_hold:
+        curr_box = image.get_box()
+        x1,y1 = curr_box['p1']
+        x2,y2 = curr_box['p2']
+        image.set_image(img_data[y1:y2,x1:x2])
 
 if __name__ == "__main__":
 
@@ -133,6 +148,7 @@ if __name__ == "__main__":
     HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
     SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
+    cropped_images_path = './astropy_sam/cropped_imgs'
 
     # Define lists of region files
     HII_reg_files = glob.glob(os.path.join(HII_folder_path, '*.reg'))
@@ -147,11 +163,15 @@ if __name__ == "__main__":
     image_holder = []
 
     # Generate and append the cropped images to the image holder
-    image_holder.extend(gen_images(HII_reg_files, 'HII'))
-    image_holder.extend(gen_images(SNR_reg_files, 'SNR'))
+    image_holder.extend(gen_crops(HII_reg_files, 'HII'))
+    image_holder.extend(gen_crops(SNR_reg_files, 'SNR'))
 
     # Print out the image holder
     for image in image_holder:
         print(image)
+
+    # Generate the image for the each image in the image holder.
+    generate_images(image_holder)
+
 
 
