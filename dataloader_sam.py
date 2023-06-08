@@ -1,5 +1,5 @@
 # Import necessary libraries
-import old_model.dataloader_reg
+from old_model.dataloader_reg import generate_annotation, annotate_reg, center_arr, get_center, point_in_polygon
 #from utils.data_utils import *
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -53,7 +53,7 @@ def contains_image(fi):
 remove_skycoord_regions()
 
 # Have each 180x180 image in a list ready to pass to sam in a loop.
-ann = dataloader_reg.generate_annotation()
+ann = generate_annotation()
 print(ann)
 
 
