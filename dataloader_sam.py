@@ -15,11 +15,12 @@ cropped_size = 180
 # Define full image shape
 image_shape = 16740
 # Define the crop image ID index
-crop_id = 0
+#crop_id = 0
 
 
 # Define a class to store cropped images
 class Cropped_Image():
+    crop_id = 0
     def __init__(self, cen, file_type) -> None:
         # Define the center of the cropped image
         self.center = cen
