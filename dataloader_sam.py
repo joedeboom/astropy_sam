@@ -14,8 +14,8 @@ from regions import Regions
 size = 180
 image_shape = 16740
 
-HII_folder_path = './drive/MyDrive/Astropy/LMC/HII_boundaries'
-SNR_folder_path = './drive/MyDrive/Astropy/LMC/SNR_boundaries'
+HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
+SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
 
 HII_reg_files = glob.glob(os.path.join(HII_folder_path, '*.reg'))
 SNR_reg_files = glob.glob(os.path.join(SNR_folder_path, '*.reg'))
@@ -50,7 +50,11 @@ def contains_image(fi):
 
 # -------------------------------------------------------------------------------------
 
+remove_skycoord_regions()
+
+# Have each 180x180 image in a list ready to pass to sam in a loop.
+ann = dataloader_reg.generate_annotation()
+print(ann)
 
 
- ann = dataloader_reg.generate_annotation()
-# Have each 180x180 image in a list ready to pass to sam in a loop. 
+
