@@ -1,6 +1,7 @@
 # Import necessary libraries
 #from old_model.dataloader_reg import generate_annotation, annotate_reg, center_arr, get_center, point_in_polygon
 #from utils.data_utils import *
+import sys
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
@@ -44,7 +45,7 @@ class Cropped_Image():
     def get_type(self):
         return self.type
     def __str__(self) -> str:
-        s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box)
+        s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image))
         return s
     def set_image(self, img) -> None:
         self.image = img.copy()
