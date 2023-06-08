@@ -20,8 +20,8 @@ image_shape = 16740
 
 # Define a class to store cropped images
 class Cropped_Image():
-    crop_id = 0
-    def __init__(self, cen, file_type) -> None:
+    index = 0
+    def __init__(self, cen, file_type, cid) -> None:
         # Define the center of the cropped image
         self.center = cen
         # Define the boundary of the cropped image
@@ -29,8 +29,8 @@ class Cropped_Image():
         # Define the type of image
         self.type = file_type
         # Define the image id
-        self.id = crop_id
-        crop_id += 1
+        self.id = Cropped_Image.index
+        Cropped_Image.index += 1
     def get_center(self):
         return self.center
     def get_box(self):
