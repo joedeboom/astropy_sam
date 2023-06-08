@@ -92,6 +92,9 @@ if __name__ == "__main__":
     hii_centers = get_centers(HII_reg_files)
     snr_centers = get_centers(SNR_reg_files)
 
+    print(hii_centers)
+
+    print(snr_centers)
     # Generate a cropped image for each region
     #hii_images = generate_images(image_path, HII_reg_files)
     #snr_images = generate_images(image_path, SNR_reg_files)
