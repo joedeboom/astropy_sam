@@ -172,7 +172,7 @@ if __name__ == "__main__":
         print(image)
 
     # Generate the image for the each image in the image holder.
-    generate_images(image_holder)
+    generate_images(image_path, image_holder)
 
 
 
