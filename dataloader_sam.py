@@ -24,7 +24,7 @@ class Cropped_Image():
         # Define the center of the cropped image
         self.center = cen
         # Define the boundary of the cropped image
-        self.box = generate_boundary(cen)
+        self.box = self.generate_boundary(cen)
         # Define the type of image
         self.type = file_type
         # Define the image id
