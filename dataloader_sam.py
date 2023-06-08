@@ -10,35 +10,18 @@ import os
 import glob
 from regions import Regions
 
-# hard code parameter for file and image and diretory
-size = 180
-image_shape = 16740
-
-HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
-SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
-
-HII_reg_files = glob.glob(os.path.join(HII_folder_path, '*.reg'))
-SNR_reg_files = glob.glob(os.path.join(SNR_folder_path, '*.reg'))
-
 
 # -------------------------------------------------------------------------------------
 # Define a function to remove skycoord regions
-def remove_skycoord_regions():
-    print('removing skycoord regions')
-    count1 = 0
-    count2 = 0
+def remove_skycoord_regions(files, coord_type):
+    count = 0
     removed = []
-    for file in HII_reg_files:
+    for file in files:
         if not contains_image(file):
-            HII_reg_files.remove(file)
+            files.remove(file)
             removed.append(file)
-            count1 += 1
-    for file in SNR_reg_files:
-        if not contains_image(file):
-            SNR_reg_files.remove(file)
-            removed.append(file)
-            count2 += 1
-    print('Removed ' + str(count1) + ' files from HII and ' + str(count2) + ' files from SNR. ' + str(count1+count2) + ' items in total:\n' + str(removed))
+            count += 1
+    print('Removed ' + str(count) + coord_type + ' files.')
 
 # define a function to check if the provided region file uses an image coordinate system
 def contains_image(fi):
@@ -50,15 +33,68 @@ def contains_image(fi):
 
 # -------------------------------------------------------------------------------------
 
-remove_skycoord_regions()
 
-for file in HII_reg_files:
-    print(file)
+def get_centers(files):
+    centers = []
+    for file in files:
+        regions = Regions.read(file, format='ds9')
+        Xs = regions[0].vertices.x
+        Ys = regions[0].vertices.y
+        length = len(Xs)
+        left = float('inf')
+        right = float('-inf')
+        bot = float('inf')
+        top = float('-inf')
+        for i in range(length):
+            if Xs[i] > right:
+                right = Xs[i]
+            if Xs[i] < left:
+                left = Xs[i]
+            if Ys[i] < bot:
+                bot = Ys[i]
+            if Ys[i] > top:
+                top = Ys[i]
+        centers.append(((left + right) // 2, (top + bot) // 2))
+    return centers
+
+def generate_images(path, regs):
+    #img_data = fits2matrix(path)[0][0]
+    #img_data[np.isnan(img_data)] = -1
+    image_bgr = cv2.imread(path)
+    images = []
+    for file in regs:
+        center = get_center
 
 
-# Have each 180x180 image in a list ready to pass to sam in a loop.
-#ann = generate_annotation()
-#print(ann)
+if __name__ == "__main__":
+
+    # Define cropped image size
+    size = 180
+    
+    # Define full image shape
+    image_shape = 16740
+
+    # Define data paths
+    HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
+    SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
+    image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
+
+    # Define lists of region files
+    HII_reg_files = glob.glob(os.path.join(HII_folder_path, '*.reg'))
+    SNR_reg_files = glob.glob(os.path.join(SNR_folder_path, '*.reg'))
+    
+    # Remove files with invalid coordinates
+    print('removing skycoord regions')
+    remove_skycoord_regions(HII_reg_files, ' HII ')
+    remove_skycoord_regions(SNR_reg_files, ' SNR ')
+
+    # Generate x,y coordinates for each region file
+    hii_centers = get_centers(HII_reg_files)
+    snr_centers = get_centers(SNR_reg_files)
+
+    # Generate a cropped image for each region
+    #hii_images = generate_images(image_path, HII_reg_files)
+    #snr_images = generate_images(image_path, SNR_reg_files)
 
 
 
