@@ -69,28 +69,13 @@ if __name__ == "__main__":
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
 
 
+    # Obtain the image holder
+    print('Obtaining the image holder...')
+    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
 
-    # Determine mode. 
-    # If a save file is present, will load the image holder from the provided path
-    # If not present, create a new one and save
-    
-    save_file_path = sys.argv[1]
-
-    
-    if os.path.exists(save_file_path):
-        # load an old image holder from path
-        print('Loading the image holder from ' + save_file_path)
-        image_holder = pickle.load(open(save_file_path, 'rb'))
-    else:
-        # create a new image holder from scratch
-
-        # Obtain the image holder
-        print('Obtaining the image holder...')
-        image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
-
-        # Generate the images in the image holder
-        print('Generating the cropped images...')
-        image_holder.generate_images()
+    # Generate the images in the image holder
+    print('Generating the cropped images...')
+    image_holder.generate_images()
 
 
     # Experiment with fits
@@ -120,22 +105,8 @@ if __name__ == "__main__":
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cropped_image.set_mask(mask_generator.generate(img))
         
-        """
-        plt.figure(figsize=(20,20))
-        plt.imshow(img)
-        show_anns(sam_result)
-        plt.axis('off')
-        plt.show()
-
-        mask_annotator = sv.MaskAnnotator()
-        detections = sv.Detections.from_sam(sam_result=sam_result)
-        annotated_image = mask_annotator.annotate(scene=img.copy(), detections=detections)
-        sv.plot_images_grid(
-            images=[img, annotated_image],
-            grid_size=(1, 2),
-            titles=['source image', 'segmented image']
-        )
-        """
+    print('Mask generation complete! Printing final cropped image objects...')
+    print(image_holder)
 
     # Save the image holder (with updated masks) to file
     new_save_name = 'imgholder_' + model_type + 'model_' + str(image_holder.get_image_size_crop()) + 'crop'

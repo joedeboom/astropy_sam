@@ -60,7 +60,11 @@ class Image_Holder():
         return self.image_size_full
     def get_images(self) -> list:
         return self.images
-
+    def __str__(self) -> str:
+        s = ''
+        for image in image_holder.get_images():
+            s += str(image)
+        return s
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects
     def finish_init(self) -> list:
