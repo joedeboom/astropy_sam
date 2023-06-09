@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print('shape:')
     print(str(img.shape))
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    sam_result = mask_generator.generate(image_rgb)
+    sam_result = mask_generator.generate(img_rgb)
     plt.figure(figsize=(20,20))
     plt.imshow(image_rgb)
     show_anns(sam_result)
