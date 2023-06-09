@@ -83,10 +83,10 @@ if __name__ == "__main__":
     print('\nLooping through the images...')
     for cropped_image in image_holder.get_images():
         print(cropped_image)
-        img = cropped_image.get_image()
+        img = np.array(cropped_image.get_image())
 
         print(img)
-        
+        print(img.shape)
 
         #img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
