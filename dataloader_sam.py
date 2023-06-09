@@ -179,7 +179,7 @@ def extract_images(s, i_s, s_f_n, h_f_p, s_f_p, i_p):
     generate_images(image_path, image_holder)
 
     # Print out the image holder
-    for image in image_holder:
+    #for image in image_holder:
         #print(image)
 
     # Save the cropped images to file
