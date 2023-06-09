@@ -54,11 +54,13 @@ if __name__ == "__main__":
         image_holder.generate_images()
 
         # Save the image holder to file
+        print('Saving the image holder to ' + save_file_path)
         with open(save_file_path, 'wb') as f:
             pickle.dump(image_holder, f)
 
     else:
         # load an old image holder from path
+        print('Loading the image holder from ' + sys.argv[1])
         image_holder = pickle.load(open(sys.argv[1], 'rb'))
 
 
