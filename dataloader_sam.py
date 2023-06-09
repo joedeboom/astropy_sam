@@ -138,7 +138,8 @@ def save_images(file_name, img_hold):
             pickle.dump(img, file)
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def extract_images():
 
     # Define cropped image size
     size = 180
@@ -176,10 +177,10 @@ if __name__ == "__main__":
 
     # Print out the image holder
     for image in image_holder:
-        print(image)
+        #print(image)
 
     # Save the cropped images to file
-    save_images(save_file_name, image_holder)
+    #save_images(save_file_name, image_holder)
 
-
+    return image_holder
 
