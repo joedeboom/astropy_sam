@@ -45,7 +45,6 @@ if __name__ == "__main__":
         SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
         image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
 
-
         # Obtain the image holder
         print('Obtaining the image holder...')
         image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
@@ -60,7 +59,15 @@ if __name__ == "__main__":
             pickle.dump(image_holder, f)
 
 
-    # SAM -------------------------------------------------
+    # Experiment with fits
+    hdul = fits.open(image_path)
+    hdul.info()
+
+    hdul.close()
+
+
+
+    # SAM ------------------------------------------------------------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda'
     model_type = 'default'
