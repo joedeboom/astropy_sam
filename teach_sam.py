@@ -24,7 +24,8 @@ if __name__ == "__main__":
     # If a save file is present, will load the image holder from the provided path
     # If not present, create a new one and save
     
-    save_file_path = './imgholder_save'
+    save_file_path = sys.argv[1]
+
     
     if os.path.exists(save_file_path):
         # load an old image holder from path
@@ -32,7 +33,6 @@ if __name__ == "__main__":
         image_holder = pickle.load(open(save_file_path, 'rb'))
     else:
         # create a new image holder from scratch
-
 
         # Define cropped image size
         size = 180
