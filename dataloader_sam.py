@@ -168,7 +168,7 @@ class Cropped_Image():
     def get_image(self):
         return self.image
     def get_mask(self):
-        return self.get_masks
+        return self.mask
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image))
         return s

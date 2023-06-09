@@ -92,11 +92,6 @@ if __name__ == "__main__":
         print('Generating the cropped images...')
         image_holder.generate_images()
 
-        # Save the image holder to file
-        print('Saving the image holder to ' + save_file_path)
-        with open(save_file_path, 'wb') as f:
-            pickle.dump(image_holder, f)
-
 
     # Experiment with fits
     hdul = fits.open(image_path)
@@ -143,7 +138,7 @@ if __name__ == "__main__":
         """
 
     # Save the image holder (with updated masks) to file
-    new_save_name = save_file_path + '_with_masks'
+    new_save_name = 'imgholder_' + model_type + 'model_' + str(image_holder.get_image_size_crop()) + 'crop'
     print('Saving the image holder with the updated masks to ' + new_save_name)
     with open(new_save_name, 'wb') as f:
         pickle.dump(image_holder, f)
