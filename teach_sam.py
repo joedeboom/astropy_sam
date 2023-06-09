@@ -21,14 +21,16 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 if __name__ == "__main__":
     
     # Determine mode. 
-    # If argument 'new' is present, create a new image_holder.
-    # If not present, will load the image holder from the provided path
-
-    if len(sys.argv) != 2:
-        print('Error. Wrong number of command line arguments.')
-        exit(1)
-
-    if sys.argv[1] == 'new':
+    # If a save file is present, will load the image holder from the provided path
+    # If not present, create a new one and save
+    
+    save_file_path = './imgholder_save'
+    
+    if os.path.exists(save_file_path):
+        # load an old image holder from path
+        print('Loading the image holder from ' + save_file_path)
+        image_holder = pickle.load(open(save_file_path, 'rb'))
+    else:
         # create a new image holder from scratch
 
 
@@ -64,8 +66,8 @@ if __name__ == "__main__":
         image_holder = pickle.load(open(sys.argv[1], 'rb'))
 
 
-
-    print(image_holder)
+    for img in image_holder:
+        print(img)
 
     # SAM -------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
