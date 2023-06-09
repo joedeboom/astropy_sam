@@ -115,7 +115,7 @@ class Image_Holder():
 
     # Define a function to generate and save the actual cropped image data (not just the boundaries) for each image in the holder.
     def generate_images(self):
-        img_data = fits.getdata(path)[0][0]
+        img_data = fits.getdata(self.image_path)[0][0]
         img_data[np.isnan(img_data)] = -1
         for image in self.images:
             curr_box = image.get_box()
