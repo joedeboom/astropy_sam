@@ -90,7 +90,7 @@ class Image_Holder():
                 if Ys[i] > top:
                     top = Ys[i]
             center = ((left + right) // 2, (top + bot) // 2)
-            imgs.append(Cropped_Image(center, 'HII'))
+            imgs.append(Cropped_Image(center, 'HII', self.image_size_crop, self.image_size_full))
         for file in self.SNR_reg_files:
             regions = Regions.read(file, format='ds9')
             Xs = regions[0].vertices.x
@@ -137,7 +137,7 @@ class Image_Holder():
                 self.SNR_reg_files.remove(file)
                 removed.append(file)
                 count += 1
-        print('Removed ' + str(count) + ' files: ' + str(removed))
+        print('Removed ' + str(count) + ' invalid files: ' + str(removed))
 
 
 

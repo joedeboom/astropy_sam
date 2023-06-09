@@ -32,9 +32,11 @@ if __name__ == "__main__":
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
     
     # Obtain the image holder
+    print('Obtaining the image holder...')
     image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
 
     # Generate the images in the image holder
+    print('Generating the cropped images...')
     image_holder.generate_images()
 
     print(image_holder)
