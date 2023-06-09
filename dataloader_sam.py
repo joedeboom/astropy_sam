@@ -1,6 +1,4 @@
 # Import necessary libraries
-#from old_model.dataloader_reg import generate_annotation, annotate_reg, center_arr, get_center, point_in_polygon
-#from utils.data_utils import *
 import sys
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -14,17 +12,11 @@ from astropy.io import fits
 
 
 # Define cropped image size
-cropped_size = 180
+cropped_size = 200
 # Define full image shape
 image_shape = 16740
 # Define the crop image ID index
-#crop_id = 0
 
-"""
-# Defina a cropped image holder class
-def Image_Holder():
-    def __init__(self) -> None:
-"""
 
 # Define a cropped image class
 class Cropped_Image():
