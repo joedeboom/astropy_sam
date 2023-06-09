@@ -61,7 +61,7 @@ if __name__ == "__main__":
             pickle.dump(image_holder, f)
 
 
-    for img in image_holder:
+    for img in image_holder.get_images():
         print(img)
 
     # SAM -------------------------------------------------
