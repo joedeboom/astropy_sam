@@ -42,7 +42,7 @@ class Image_Holder():
         self.image_size_full = image_shape
         
         # Define the HII and SNR folder paths
-        self.HII_folder_Path = hii_folder_path
+        self.HII_folder_path = hii_folder_path
         self.SNR_folder_path = snr_folder_path
 
         # Define the path to the full image
