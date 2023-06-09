@@ -19,7 +19,20 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 
 
 if __name__ == "__main__":
+
+    # Define cropped image size
+    size = 180
     
+    # Define full image shape
+    image_shape = 16740
+    
+    # Define data paths
+    HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
+    SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
+    image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
+
+
+
     # Determine mode. 
     # If a save file is present, will load the image holder from the provided path
     # If not present, create a new one and save
@@ -33,17 +46,6 @@ if __name__ == "__main__":
         image_holder = pickle.load(open(save_file_path, 'rb'))
     else:
         # create a new image holder from scratch
-
-        # Define cropped image size
-        size = 180
-
-        # Define full image shape
-        image_shape = 16740
-
-        # Define data paths
-        HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
-        SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
-        image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
 
         # Obtain the image holder
         print('Obtaining the image holder...')
