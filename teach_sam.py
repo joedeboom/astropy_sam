@@ -10,6 +10,8 @@ import pickle
 from regions import Regions
 from astropy.io import fits
 import matplotlib.pyplot as plt
+import supervision as sv
+
 
 import dataloader_sam
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
@@ -48,11 +50,23 @@ if __name__ == "__main__":
     img = image_holder[0].get_image()
     print('shape:')
     print(str(img.shape))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     sam_result = mask_generator.generate(image_rgb)
     plt.figure(figsize=(20,20))
     plt.imshow(image_rgb)
     show_anns(sam_result)
     plt.axis('off')
     plt.show()
+
+    print('Yip yip yippie!')
+
+    mask_annotator = sv.MaskAnnotator()
+    detections = sv.Detections.from_sam(sam_result=sam_result)
+    annotated_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+    sv.plot_images_grid(
+        images=[image_bgr, annotated_image],
+        grid_size=(1, 2),
+        titles=['source image', 'segmented image']
+    )
+
 
