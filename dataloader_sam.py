@@ -10,6 +10,8 @@ import cv2
 import os
 import glob
 from regions import Regions
+from astropy.io import fits
+
 
 # Define cropped image size
 cropped_size = 180
@@ -129,7 +131,7 @@ def gen_crops(files, file_type):
     return imgs
 
 def generate_images(path, img_hold):
-    img_data = fits2matrix(path)[0][0]
+    img_data = fits.getdata(path)[0][0]
     img_data[np.isnan(img_data)] = -1
     for image in img_hold:
         curr_box = image.get_box()
