@@ -60,40 +60,45 @@ if __name__ == "__main__":
             pickle.dump(image_holder, f)
 
 
-    for img in image_holder.get_images():
-        print(img)
-
     # SAM -------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda'
     model_type = 'default'
+    print('Creating SAM...')
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+    print('Sending SAM to ' + device)
     sam.to(device=device)
+    print('Creating automatic mask generator...')
     mask_generator = SamAutomaticMaskGenerator(sam)
     
-    img = image_holder.get_images()[0].get_image()
-    print('shape:')
-    print(str(img.shape))
+    print('\nLooping through the images...')
+    for cropped_image in image_holder.get_images():
+        print(cropped_image)
+        img = cropped_image.get_image()
     
-    print(type(img))
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+
+
+
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
-    sam_result = mask_generator.generate(img_rgb)
-    plt.figure(figsize=(20,20))
-    plt.imshow(image_rgb)
-    show_anns(sam_result)
-    plt.axis('off')
-    plt.show()
+        sam_result = mask_generator.generate(img_rgb)
+        plt.figure(figsize=(20,20))
+        plt.imshow(image_rgb)
+        show_anns(sam_result)
+        plt.axis('off')
+        plt.show()
 
-    print('Yip yip yippie!')
+        print('Yip yip yippie!')
 
-    mask_annotator = sv.MaskAnnotator()
-    detections = sv.Detections.from_sam(sam_result=sam_result)
-    annotated_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
-    sv.plot_images_grid(
-        images=[image_bgr, annotated_image],
-        grid_size=(1, 2),
-        titles=['source image', 'segmented image']
-    )
+        mask_annotator = sv.MaskAnnotator()
+        detections = sv.Detections.from_sam(sam_result=sam_result)
+        annotated_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+        sv.plot_images_grid(
+            images=[image_bgr, annotated_image],
+            grid_size=(1, 2),
+            titles=['source image', 'segmented image']
+        )
+
 
 
