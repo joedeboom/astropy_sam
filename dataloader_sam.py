@@ -7,12 +7,13 @@ import numpy as np
 import cv2
 import os
 import glob
+import pickle
 from regions import Regions
 from astropy.io import fits
 
 
 # Define cropped image size
-cropped_size = 200
+cropped_size = 180
 # Define full image shape
 image_shape = 16740
 # Define the crop image ID index
@@ -131,6 +132,12 @@ def generate_images(path, img_hold):
         x2,y2 = curr_box['p2']
         image.set_image(img_data[y1:y2,x1:x2])
 
+def save_images(file_name, img_hold):
+    with open(file_name, 'wb') as file:
+        for img in img_hold:
+            pickle.dump(img, file)
+
+
 if __name__ == "__main__":
 
     # Define cropped image size
@@ -138,6 +145,9 @@ if __name__ == "__main__":
     
     # Define full image shape
     image_shape = 16740
+
+    # Define save file name
+    save_file_name = 'crop_image_data.obj'
 
     # Define data paths
     HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
@@ -167,5 +177,9 @@ if __name__ == "__main__":
     # Print out the image holder
     for image in image_holder:
         print(image)
+
+    # Save the cropped images to file
+    save_images(save_file_name, image_holder)
+
 
 
