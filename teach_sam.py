@@ -128,16 +128,17 @@ if __name__ == "__main__":
         img = img.astype(np.uint8)
         print(img.dtype)
 
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
         sam_result = mask_generator.generate(img)
+        
+        """
         plt.figure(figsize=(20,20))
         plt.imshow(img)
         show_anns(sam_result)
         plt.axis('off')
         plt.show()
-
-        print('Yip yip yippie!')
+        """
 
         mask_annotator = sv.MaskAnnotator()
         detections = sv.Detections.from_sam(sam_result=sam_result)
