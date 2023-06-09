@@ -87,16 +87,12 @@ if __name__ == "__main__":
 
         print(img)
         
-        window_name = 'window'
-        cv2.imshow(window_name, img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
-        sam_result = mask_generator.generate(img_rgb)
+        sam_result = mask_generator.generate(img)
         plt.figure(figsize=(20,20))
-        plt.imshow(image_rgb)
+        plt.imshow(img)
         show_anns(sam_result)
         plt.axis('off')
         plt.show()
