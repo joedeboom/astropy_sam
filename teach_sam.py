@@ -121,16 +121,9 @@ if __name__ == "__main__":
     for cropped_image in image_holder.get_images():
         print(cropped_image)
         img = np.array(cropped_image.get_image())
-
-        print(img)
-        print(img.shape)
-        print(img.dtype)
         img = img.astype(np.uint8)
-        print(img.dtype)
-
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    
-        sam_result = mask_generator.generate(img)
+        cropped_image.set_mask(mask_generator.generate(img))
         
         """
         plt.figure(figsize=(20,20))
@@ -138,7 +131,6 @@ if __name__ == "__main__":
         show_anns(sam_result)
         plt.axis('off')
         plt.show()
-        """
 
         mask_annotator = sv.MaskAnnotator()
         detections = sv.Detections.from_sam(sam_result=sam_result)
@@ -148,6 +140,12 @@ if __name__ == "__main__":
             grid_size=(1, 2),
             titles=['source image', 'segmented image']
         )
+        """
 
+    # Save the image holder (with updated masks) to file
+    new_save_name = save_file_path + '_with_masks'
+    print('Saving the image holder with the updated masks to ' + new_save_name)
+    with open(new_save_name, 'wb') as f:
+        pickle.dump(image_holder, f)
 
 

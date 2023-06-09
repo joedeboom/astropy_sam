@@ -142,14 +142,21 @@ class Cropped_Image():
     def __init__(self, cen, file_type, size, image_shape) -> None:
         # Define the center of the cropped image
         self.center = cen
+        
         # Define the boundary of the cropped image
         self.box = self.generate_boundary(size, image_shape)
+        
         # Define the type of image
         self.type = file_type
+        
         # Define the image id
         self.id = Cropped_Image.index
         Cropped_Image.index += 1
         self.image = None
+        
+        # Define the mask for the image
+        self.mask = None
+    
     def get_center(self):
         return self.center
     def get_box(self):
@@ -160,11 +167,15 @@ class Cropped_Image():
         return self.id
     def get_image(self):
         return self.image
+    def get_mask(self):
+        return self.get_masks
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image))
         return s
     def set_image(self, img) -> None:
         self.image = img.copy()
+    def set_mask(self, m) -> None:
+        self.mask = m
     def generate_boundary(self, crop_size, full_size) -> None:
         # Define a function to generate the cropped images to pass into the model.
         # Input: the center coordinates of the region to be cropped
