@@ -167,12 +167,11 @@ if __name__ == "__main__":
     image_holder.extend(gen_crops(HII_reg_files, 'HII'))
     image_holder.extend(gen_crops(SNR_reg_files, 'SNR'))
 
-    # Print out the image holder
-    for image in image_holder:
-        print(image)
-
     # Generate the image for the each image in the image holder.
     generate_images(image_path, image_holder)
 
+    # Print out the image holder
+    for image in image_holder:
+        print(image)
 
 
