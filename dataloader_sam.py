@@ -39,6 +39,10 @@ class Cropped_Image():
         return self.box
     def get_type(self):
         return self.type
+    def get_id(self):
+        return self.id
+    def get_image(self):
+        return self.image
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image))
         return s
@@ -139,22 +143,21 @@ def save_images(file_name, img_hold):
 
 
 #if __name__ == "__main__":
-def extract_images():
+def extract_images(s, i_s, s_f_n, h_f_p, s_f_p, i_p):
 
     # Define cropped image size
-    size = 180
+    size = s
     
     # Define full image shape
-    image_shape = 16740
+    image_shape = i_s
 
     # Define save file name
-    save_file_name = 'crop_image_data.obj'
+    save_file_name = s_f_n
 
     # Define data paths
-    HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
-    SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
-    image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
-    cropped_images_path = './astropy_sam/cropped_imgs'
+    HII_folder_path = h_f_p
+    SNR_folder_path = s_f_p
+    image_path = i_p
 
     # Define lists of region files
     HII_reg_files = glob.glob(os.path.join(HII_folder_path, '*.reg'))
