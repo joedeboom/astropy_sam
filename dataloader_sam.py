@@ -54,7 +54,7 @@ class Image_Holder():
         self.SNR_reg_files = glob.glob(os.path.join(self.SNR_folder_path, '*.reg'))
 
         # Remove any regions using an invalid coordinate system
-        remove_skycoor_regions()
+        self.remove_skycoor_regions()
 
         # Define the list to hold the cropped image objects
         self.images = self.finish_init()
