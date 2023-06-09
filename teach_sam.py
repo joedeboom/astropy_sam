@@ -19,25 +19,49 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 
 
 if __name__ == "__main__":
-
-    # Define cropped image size
-    size = 180
-
-    # Define full image shape
-    image_shape = 16740
-
-    # Define data paths
-    HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
-    SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
-    image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
     
-    # Obtain the image holder
-    print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
+    # Determine mode. 
+    # If argument 'new' is present, create a new image_holder.
+    # If not present, will load the image holder from the provided path
 
-    # Generate the images in the image holder
-    print('Generating the cropped images...')
-    image_holder.generate_images()
+    if len(sys.argv) != 2:
+        print('Error. Wrong number of command line arguments.')
+        exit(1)
+
+    if sys.argv[1] == 'new':
+        # create a new image holder from scratch
+
+
+        # Define cropped image size
+        size = 180
+
+        # Define full image shape
+        image_shape = 16740
+
+        # Define data paths
+        HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
+        SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
+        image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
+        save_file_path = './imgholder_save1'
+
+
+        # Obtain the image holder
+        print('Obtaining the image holder...')
+        image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
+
+        # Generate the images in the image holder
+        print('Generating the cropped images...')
+        image_holder.generate_images()
+
+        # Save the image holder to file
+        with open(save_file_path, 'wb') as f:
+            pickle.dump(image_holder, f)
+
+    else:
+        # load an old image holder from path
+        image_holder = pickle.load(open(sys.argv[1], 'rb'))
+
+
 
     print(image_holder)
 
@@ -49,7 +73,7 @@ if __name__ == "__main__":
     sam.to(device=device)
     mask_generator = SamAutomaticMaskGenerator(sam)
     
-    img = image_holder[0].get_image()
+    img = image_holder.get_images()[0].get_image()
     print('shape:')
     print(str(img.shape))
     
