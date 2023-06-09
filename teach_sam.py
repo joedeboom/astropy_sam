@@ -84,10 +84,8 @@ if __name__ == "__main__":
     for cropped_image in image_holder.get_images():
         print(cropped_image)
         img = cropped_image.get_image()
+
         print(img)
-
-
-
 
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
