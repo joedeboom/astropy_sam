@@ -12,12 +12,6 @@ from regions import Regions
 from astropy.io import fits
 
 
-# Define cropped image size
-cropped_size = 180
-# Define full image shape
-image_shape = 16740
-# Define the crop image ID index
-
 
 # define a function to check if the provided region file uses an image coordinate system
 # Used in the Image_Holder initialization to help remove the invalid coordinate region files
