@@ -128,7 +128,7 @@ if __name__ == "__main__":
         img = img.astype(np.uint8)
         print(img.dtype)
 
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
         sam_result = mask_generator.generate(img)
         plt.figure(figsize=(20,20))
@@ -141,9 +141,9 @@ if __name__ == "__main__":
 
         mask_annotator = sv.MaskAnnotator()
         detections = sv.Detections.from_sam(sam_result=sam_result)
-        annotated_image = mask_annotator.annotate(scene=image_bgr.copy(), detections=detections)
+        annotated_image = mask_annotator.annotate(scene=img.copy(), detections=detections)
         sv.plot_images_grid(
-            images=[image_bgr, annotated_image],
+            images=[img, annotated_image],
             grid_size=(1, 2),
             titles=['source image', 'segmented image']
         )
