@@ -9,6 +9,7 @@ import glob
 import pickle
 from regions import Regions
 from astropy.io import fits
+import matplotlib.pyplot as plt
 
 import dataloader_sam
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
@@ -40,12 +41,18 @@ if __name__ == "__main__":
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda'
     model_type = 'default'
-    #sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
-    #sam.to(device=device)
-    #mask_generator = SamAutomaticMaskGenerator(sam)
+    sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
+    sam.to(device=device)
+    mask_generator = SamAutomaticMaskGenerator(sam)
     
     img = image_holder[0].get_image()
     print('shape:')
     print(str(img.shape))
-    #sam_result = mask_generator.generate(image_rgb)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    sam_result = mask_generator.generate(image_rgb)
+    plt.figure(figsize=(20,20))
+    plt.imshow(image_rgb)
+    show_anns(sam_result)
+    plt.axis('off')
+    plt.show()
 
