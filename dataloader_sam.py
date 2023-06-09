@@ -77,7 +77,7 @@ class Cropped_Image():
         y2 = y + radius
         if y2 > image_shape:
             y2 = image_shape
-        b = {'p1':(x1,y1), 'p2':(x2,y2)}
+        b = {'p1':(int(x1),int(y1)), 'p2':(int(x2),int(y2))}
         return b
 
 
