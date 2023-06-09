@@ -119,7 +119,7 @@ if __name__ == "__main__":
     
     print('\nGenerating masks...')
     for cropped_image in tqdm(image_holder.get_images()):
-        print(cropped_image)
+        #print(cropped_image)
         img = np.array(cropped_image.get_image())
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
