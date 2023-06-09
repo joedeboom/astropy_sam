@@ -37,6 +37,8 @@ if __name__ == "__main__":
     # Generate the images in the image holder
     image_holder.generate_images()
 
+    print(image_holder)
+
     # SAM -------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda'
