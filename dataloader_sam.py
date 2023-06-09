@@ -64,7 +64,7 @@ class Cropped_Image():
         #  *------------x2,y2
         #
         x, y = self.center
-        radius = cropped_size / 2
+        radius = int(cropped_size / 2)
         x1 = x - radius
         if x1 < 0:
             x1 = 0
