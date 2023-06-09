@@ -88,7 +88,7 @@ if __name__ == "__main__":
         print(img)
         print(img.shape)
 
-        #img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
         sam_result = mask_generator.generate(img)
         plt.figure(figsize=(20,20))
