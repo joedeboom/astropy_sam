@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import supervision as sv
 
 
-import dataloader_sam
+from dataloader_sam import Image_Holder, Cropped_Image
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
 

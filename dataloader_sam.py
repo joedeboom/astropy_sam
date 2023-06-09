@@ -58,6 +58,7 @@ class Image_Holder():
 
         # Define the list to hold the cropped image objects
         self.images = self.finish_init()
+        print('Created ' + str(len(self.images)) + ' images.')
 
     def get_image_size_crop(self) -> int:
         return self.image_size_crop
