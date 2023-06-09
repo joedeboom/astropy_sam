@@ -44,7 +44,6 @@ if __name__ == "__main__":
         HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
         SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
         image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
-        save_file_path = './imgholder_save1'
 
 
         # Obtain the image holder
