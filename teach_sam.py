@@ -86,6 +86,11 @@ if __name__ == "__main__":
         img = cropped_image.get_image()
 
         print(img)
+        
+        window_name = 'window'
+        cv2.imshow(window_name, img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
