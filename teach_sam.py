@@ -11,7 +11,7 @@ from regions import Regions
 from astropy.io import fits
 import matplotlib.pyplot as plt
 import supervision as sv
-
+from tqdm import tqdm
 
 from dataloader_sam import Image_Holder, Cropped_Image
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
@@ -117,8 +117,8 @@ if __name__ == "__main__":
     print('Creating automatic mask generator...')
     mask_generator = SamAutomaticMaskGenerator(sam)
     
-    print('\nLooping through the images...')
-    for cropped_image in image_holder.get_images():
+    print('\nGenerating masks...')
+    for cropped_image in tqdm(image_holder.get_images()):
         print(cropped_image)
         img = np.array(cropped_image.get_image())
         img = img.astype(np.uint8)
