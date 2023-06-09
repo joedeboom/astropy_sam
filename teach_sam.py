@@ -50,7 +50,10 @@ if __name__ == "__main__":
     img = image_holder[0].get_image()
     print('shape:')
     print(str(img.shape))
+    
+    print(type(img))
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    
     sam_result = mask_generator.generate(img_rgb)
     plt.figure(figsize=(20,20))
     plt.imshow(image_rgb)
