@@ -60,11 +60,6 @@ if __name__ == "__main__":
         with open(save_file_path, 'wb') as f:
             pickle.dump(image_holder, f)
 
-    else:
-        # load an old image holder from path
-        print('Loading the image holder from ' + sys.argv[1])
-        image_holder = pickle.load(open(sys.argv[1], 'rb'))
-
 
     for img in image_holder:
         print(img)
