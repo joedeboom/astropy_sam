@@ -26,18 +26,16 @@ if __name__ == "__main__":
     # Define full image shape
     image_shape = 16740
 
-    # Define save file name
-    save_file_name = 'crop_image_data.obj'
-
     # Define data paths
     HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
     SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
     
     # Obtain the image holder
-    image_holder = dataloader_sam.extract_images(size, image_shape, save_file_name, HII_folder_path, SNR_folder_path, image_path)
+    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
 
-    
+    # Generate the images in the image holder
+    image_holder.generate_images()
 
     # SAM -------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
