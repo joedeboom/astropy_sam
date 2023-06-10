@@ -66,12 +66,14 @@ if __name__ == "__main__":
     # Define data paths
     HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
     SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
+    HII_csv_path = './astropy_sam/old_model/csv/hii_regions.csv'
+    SNR_csv_path = './astropy_sam/old_model/csv/snrs.csv'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
 
 
     # Obtain the image holder
     print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, image_path)
+    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path)
 
     # Generate the images in the image holder
     print('Generating the cropped images...')
@@ -88,7 +90,7 @@ if __name__ == "__main__":
 
     # SAM ------------------------------------------------------------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
-    device = 'cuda'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model_type = 'default'
     print('Creating SAM...')
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)

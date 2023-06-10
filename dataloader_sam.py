@@ -1,5 +1,6 @@
 # Import necessary libraries
 import sys
+import csv
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
@@ -28,16 +29,20 @@ def contains_image(fi):
 
 # Define a cropped image holder class
 class Image_Holder():
-    def __init__(self, size, image_shape, hii_folder_path, snr_folder_path, img_path) -> None:
+    def __init__(self, size, image_shape, hii_folder_path, snr_folder_path, hii_csv_path, snr_csv_path, img_path) -> None:
         # Define the cropped image size
         self.image_size_crop = size
 
         # Define the full image size
         self.image_size_full = image_shape
         
-        # Define the HII and SNR folder paths
+        # Define the HII and SNR region folder paths
         self.HII_folder_path = hii_folder_path
         self.SNR_folder_path = snr_folder_path
+
+        # Define the hii and snr csv paths
+        self.HII_csv_path = hii_csv_path
+        self.SNR_csv_path = snr_csv_path
 
         # Define the path to the full image
         self.image_path = img_path
@@ -51,7 +56,8 @@ class Image_Holder():
         self.remove_skycoord_regions()
 
         # Define the list to hold the cropped image objects
-        self.images = self.finish_init()
+        #self.images = self.finish_init()
+        self.images = self.finish_init_csv()
         print('Created ' + str(len(self.images)) + ' images.')
 
     def get_image_size_crop(self) -> int:
@@ -66,7 +72,19 @@ class Image_Holder():
             s += str(image)
         return s
 
-    # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects
+    # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
+    # This function reads in the data from the provided csv files.
+    def finish_init_csv(self) -> list:
+        imgs = []
+        with open(self.HII_csv_path, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                print(row)
+        exit(2)
+
+
+    # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
+    # This function loads computes the centers of each image via the region files.
     def finish_init(self) -> list:
         imgs = []
         for file in self.HII_reg_files:
