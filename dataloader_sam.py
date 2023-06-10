@@ -83,7 +83,8 @@ class Image_Holder():
     def __str__(self) -> str:
         s = ''
         for image in self.images:
-            s += str(image)
+            if image.get_id() % 50 == 0:
+                s += str(image)
         return s
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
@@ -157,7 +158,11 @@ class Image_Holder():
             x1,y1 = curr_box['p1']
             x2,y2 = curr_box['p2']
             image.set_image(img_data[y1:y2,x1:x2])
-    
+            if image.get_id() % 50 == 0:
+                print('raw image data for #' + str(image.get_id()))
+                print(img_data[y1:y2,x1:x2])
+
+
     # Define a function to clear the image data for all images (for saving)
     def clear_images(self):
         for image in self.images:
@@ -249,8 +254,6 @@ class Cropped_Image():
         return s
     def set_image(self, img) -> None:
         self.image = img.copy()
-        print('Image set:')
-        self.print_image()
     def clear_image(self) -> None:
         self.image = None
     def set_mask(self, m) -> None:
