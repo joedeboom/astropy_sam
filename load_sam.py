@@ -81,8 +81,9 @@ if __name__ == "__main__":
     mode = 'csv'
 
     # Obtain the image holder
+    save_file_path = './imgholder_save'
     print('Loading the image holder from ' + save_file_path + '...',end='\t')
-    image_holder = pickle.load(open('./imgholder_save', 'rb'))
+    image_holder = pickle.load(open(save_file_path', 'rb'))
     if image_holder is not None:
         print('Success!')
     else:
