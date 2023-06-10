@@ -66,8 +66,11 @@ class Image_Holder():
             self.images = self.finish_init_region()
         elif mode == 'csv':
             self.images = self.finish_init_csv()
+        elif modde == 'grid':
+            self.images = self.finish_init_grid()
         elif mode == 'all':
             self.images = self.finish_init_region()
+            self.images.extend(self.finish_init_csv)
             self.images.extend(self.finish_init_csv)
         else:
             print('Invalid mode.')
@@ -99,6 +102,12 @@ class Image_Holder():
             count += len(image.get_mask())
         ave = count / len(self.images)
         return ave
+
+    # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
+    # This function will create images from a grid of the original
+    def finish_init_grid(self) -> list:
+        imgs = []
+        pass
 
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
@@ -215,7 +224,7 @@ class Image_Holder():
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         for  image in self.images:
-            images.generate_plot(full_path)
+            image.generate_plot(full_path)
 
 
 
