@@ -90,9 +90,10 @@ class Image_Holder():
         s = '\n\nImage count: ' + str(len(self.images))
         s += '\nImage crop size: ' + str(self.image_size_crop)
         count = 0.0
-        for image in self.images:
-            count += len(image.get_mask())
-        s += '\nAverage mask count per image: ' + str(count) + '\n'
+        if self.images[0].get_image() is not None:
+            for image in self.images:
+                count += len(image.get_mask())
+            s += '\nAverage mask count per image: ' + str(count) + '\n'
         return s
 
 
