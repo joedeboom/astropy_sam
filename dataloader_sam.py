@@ -289,7 +289,7 @@ class CSV_Image(Cropped_Image):
     index = 0
     def __init__(self, csv, file_type, crop_size, image_shape) -> None:
         # Init Super
-        super().__init__((int(csv['X_center']),int(csv['Y_center'])), file_type, crop_size, image_shape)
+        super().__init__((float(csv['X_center']),float(csv['Y_center'])), file_type, crop_size, image_shape)
 
         # Define the raw csv dictionary data
         # {'': '0', 'Name': 'MCELS-L1', 'X_center': '13668.075', 'Y_center': '7012.1650', 'Radius': '12.500000'}
