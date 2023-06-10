@@ -152,7 +152,7 @@ class Image_Holder():
 
         for x in range(side_len // 2, self.image_size_full, side_len):
             for y in range(side_len // 2, self.image_size_full, side_len):
-                imgs.append(Grid_Image((x,y), 'GRID', self.image_size_crop, self.image_size_full))
+                imgs.append(Grid_Image((x,y), 'GRID', side_len, self.image_size_full))
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function reads in the data from the provided csv files.
@@ -264,7 +264,7 @@ class Image_Holder():
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path):
-        full_path = path + '/maskcount' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
+        full_path = path + '/' + self.mode + '-maskcount' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         for  image in self.images:
