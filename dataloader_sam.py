@@ -267,7 +267,7 @@ class Image_Holder():
         full_path = path + '/maskcount' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
-        for  image in tqdm(self.images):
+        for  image in self.images:
             image.generate_plot(full_path)
 
 
@@ -461,7 +461,7 @@ class CSV_Image(Cropped_Image):
         print('Saving to ' + dest_name)
         plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
     
-
+        plt.close()
 
 
 
