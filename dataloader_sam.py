@@ -93,8 +93,15 @@ class Image_Holder():
         if self.images[0].get_image() is not None:
             for image in self.images:
                 count += len(image.get_mask())
-            s += '\nAverage mask count per image: ' + str(count) + '\n'
+            ave = count / len(self.images)
+            s += '\nAverage mask count per image: ' + str(ave) + '\n'
         return s
+    def ave_masks(self):
+        count = 0.0
+        for image in self.images:
+            count += len(image.get_mask())
+        ave = count / len(self.images)
+        return ave
 
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
