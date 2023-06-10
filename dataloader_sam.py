@@ -81,11 +81,20 @@ class Image_Holder():
     def get_images(self) -> list:
         return self.images
     def __str__(self) -> str:
-        s = ''
+        s = self.print_stats()
         for image in self.images:
             if image.get_id() % 50 == 0:
                 s += str(image)
         return s
+    def print_stats(self) -> str:
+        s = '\n\nImage count: ' + str(len(self.images))
+        s += '\nImage crop size: ' + str(self.image_size_crop)
+        count = 0.0
+        for image in self.images:
+            count += len(image.get_mask())
+        s += '\nAverage mask count per image: ' + str(count) + '\n'
+        return s
+
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function reads in the data from the provided csv files.
@@ -158,9 +167,9 @@ class Image_Holder():
             x1,y1 = curr_box['p1']
             x2,y2 = curr_box['p2']
             image.set_image(img_data[y1:y2,x1:x2])
-            if image.get_id() % 50 == 0:
-                print('raw image data for #' + str(image.get_id()))
-                print(img_data[y1:y2,x1:x2])
+            #if image.get_id() % 50 == 0:
+                #print('raw image data for #' + str(image.get_id()))
+                #print(img_data[y1:y2,x1:x2])
 
 
     # Define a function to clear the image data for all images (for saving)
@@ -333,6 +342,7 @@ class CSV_Image(Cropped_Image):
         s = '\n\nCSV file'
         s += '\nID: ' + str(self.id)
         s += '\nType: ' + self.type
+        s += '\nName: ' + self.get_name()
         s += '\nCenter: ' + str(self.center)
         s += '\nRadius: ' +  str(self.get_radius())
         s += '\nBox: ' + str(self.box)
