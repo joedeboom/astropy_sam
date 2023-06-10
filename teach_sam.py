@@ -113,19 +113,19 @@ if __name__ == "__main__":
         cropped_image.set_mask(mask_generator.generate(img))
         
     # Save the plots to folder
-    print('Mask generation complete! Saving plots to ' + save_plots_folder_path + '...')
+    print('Mask generation complete! Generating plots and saving to ' + save_plots_folder_path + '...')
     image_holder.save_plots(save_plots_folder_path)
 
     # Clear the image data
-    print('Clearing the image data...')
-    image_holder.clear_images()
+    #print('Clearing the image data...')
+    #image_holder.clear_images()
 
-    print(image_holder)
+    #print(image_holder)
     
     # Define the image holder save name
-    new_save_name = 'imgholder_' + model_type + '_model_' + str(image_holder.get_image_size_crop()) + 'crop_' + str(image_holder.ave_masks()) + 'maskAve'
-    print('Saving the image holder with the updated masks to ' + new_save_name)
-    with open(new_save_name, 'wb') as f:
-        pickle.dump(image_holder, f)
+    #new_save_name = 'imgholder_' + model_type + '_model_' + str(image_holder.get_image_size_crop()) + 'crop_' + str(image_holder.ave_masks()) + 'maskAve'
+    #print('Saving the image holder with the updated masks to ' + new_save_name)
+    #with open(new_save_name, 'wb') as f:
+        #pickle.dump(image_holder, f)
 
 
