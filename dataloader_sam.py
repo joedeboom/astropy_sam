@@ -225,7 +225,7 @@ class Cropped_Image():
     def get_mask(self):
         return self.mask
     def print_mask(self):
-        if mask is None:
+        if self.mask is None:
             return 'Not generated yet'
         else:
             return self.mask
