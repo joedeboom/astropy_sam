@@ -153,6 +153,7 @@ class Image_Holder():
         for x in range(side_len // 2, self.image_size_full, side_len):
             for y in range(side_len // 2, self.image_size_full, side_len):
                 imgs.append(Grid_Image((x,y), 'GRID', side_len, self.image_size_full))
+        return imgs
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function reads in the data from the provided csv files.
