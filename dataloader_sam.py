@@ -11,7 +11,7 @@ import glob
 import pickle
 from regions import Regions
 from astropy.io import fits
-
+import matplotlib.pyplot as plt
 
 
 # define a function to check if the provided region file uses an image coordinate system
@@ -107,7 +107,13 @@ class Image_Holder():
     # This function will create images from a grid of the original
     def finish_init_grid(self) -> list:
         imgs = []
-        pass
+        valid_dim = [1,2,3,4,5,6,9,10,12,15,18,20,27,30,31,36,45,54,60,62,90,93,108,124,135,155,180,186,270,279,310,372,465,540,558,620,837,930,1116,1395,1674,1860,2790,3348,4185,5580,8370,16740]
+        
+        side_len = 180
+        if self.image_size_full % side_len != 0:
+            print('Error. Invalid grid side length.')
+            exit(1)
+        root_num_img = self.image_size_full / self.image_size-Crop
 
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
