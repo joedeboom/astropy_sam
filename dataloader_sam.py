@@ -215,6 +215,8 @@ class Image_Holder():
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path):
         full_path = path + str(round(image_holder.ave_masks(),5)) + 'masks/'
+        if not os.path.exists(full_path):
+            os.makedirs(full_path)
         for  image in self.images:
             images.generate_plot(full_path)
 
