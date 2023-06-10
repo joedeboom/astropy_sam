@@ -102,7 +102,7 @@ class Image_Holder():
             self.images = self.finish_init_region()
         elif mode == 'csv':
             self.images = self.finish_init_csv()
-        elif modde == 'grid':
+        elif mode == 'grid':
             self.images = self.finish_init_grid()
         elif mode == 'all':
             self.images = self.finish_init_region()
