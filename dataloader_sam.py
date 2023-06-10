@@ -224,6 +224,11 @@ class Cropped_Image():
         return self.image
     def get_mask(self):
         return self.mask
+    def print_mask(self):
+        if mask is None:
+            return 'Not generated yet'
+        else:
+            return self.mask
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image)) + '\nMask: \n' + str(self.mask)
         return s
@@ -272,13 +277,13 @@ class Region_Image(Cropped_Image):
     def __init__(self, cen, file_type, crop_size, image_shape) -> None:
         super().__init__(cen, file_type, crop_size, image_shape)
     def __str__(self) -> str:
-        s = '\nRegion file.'
+        s = '\n\nRegion file.'
         s += '\nID: ' + str(self.id)
         s += '\nType: ' + self.type
         s += '\nCenter: ' + str(self.center)
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
-        s += '\nMask: \n' + str(self.mask)
+        s += '\nMask: ' + str(self.print_mask())
         return s
 
 
@@ -304,14 +309,14 @@ class CSV_Image(Cropped_Image):
     def get_radius(self):
         return float(self.csv_data['Radius'])
     def __str__(self) -> str:
-        s = '\nCSV file'
+        s = '\n\nCSV file'
         s = '\nID: ' + str(self.id)
         s += '\nType: ' + self.type
         s += '\nCenter: ' + str(self.center)
         s += '\nRadius: ' +  str(self.get_radius())
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
-        s += '\nMask: \n' + str(self.mask)
+        s += '\nMask: ' + str(self.print_mask())
         return s
 
 
