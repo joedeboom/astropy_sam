@@ -298,11 +298,11 @@ class CSV_Image(Cropped_Image):
     def get_name(self):
         return self.csv_data['Name']
     def get_X_center(self):
-        return int(self.csv_data['X_center'])
+        return float(self.csv_data['X_center'])
     def get_Y_center(self):
-        return int(self.csv_data['Y_center'])
+        return float(self.csv_data['Y_center'])
     def get_radius(self):
-        return int(self.csv_data['Radius'])
+        return float(self.csv_data['Radius'])
     def __str__(self) -> str:
         s = '\nCSV file'
         s = '\nID: ' + str(self.id)
