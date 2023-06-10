@@ -70,6 +70,11 @@ if __name__ == "__main__":
     SNR_csv_path = './astropy_sam/old_model/csv/snrs.csv'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
     save_plots_folder_path = './cropped_imgs'
+    
+    # Check the save plot folder path
+    if not os.path.exists(save_plots_folder_path):
+        print('Error. Path does not exist: ' + save_plots_folder_path)
+        exit(1)
 
 
     # Define the mode. Determine to construct the images from region files or the csv files.
