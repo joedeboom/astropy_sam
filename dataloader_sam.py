@@ -12,7 +12,7 @@ import pickle
 from regions import Regions
 from astropy.io import fits
 import matplotlib.pyplot as plt
-
+from tqdm import tqdm
 
 # define a function to check if the provided region file uses an image coordinate system
 # Used in the Image_Holder initialization to help remove the invalid coordinate region files
@@ -267,7 +267,7 @@ class Image_Holder():
         full_path = path + str(round(self.ave_masks(),5)) + 'masks/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
-        for  image in self.images:
+        for  image in tqdm(self.images):
             image.generate_plot(full_path)
 
 
