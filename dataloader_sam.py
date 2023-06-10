@@ -79,7 +79,7 @@ class Image_Holder():
         return self.images
     def __str__(self) -> str:
         s = ''
-        for image in image_holder.get_images():
+        for image in self.images:
             s += str(image)
         return s
 
