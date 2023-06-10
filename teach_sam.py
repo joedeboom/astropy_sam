@@ -70,10 +70,12 @@ if __name__ == "__main__":
     SNR_csv_path = './astropy_sam/old_model/csv/snrs.csv'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
 
+    # Define the mode. Determine to construct the images from region files or the csv files.
+    mode = 'csv'
 
     # Obtain the image holder
     print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path)
+    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path, mode)
 
     # Generate the images in the image holder
     print('Generating the cropped images...')
@@ -86,6 +88,7 @@ if __name__ == "__main__":
 
     hdul.close()
 
+    print(image_holder)
 
 
     # SAM ------------------------------------------------------------------------------------------------------
@@ -109,6 +112,9 @@ if __name__ == "__main__":
         
     print('Mask generation complete! Printing final cropped image objects...')
     print(image_holder)
+
+    # Clear the image data
+    image_holder.clear_images()
 
     # Save the image holder (with updated masks) to file
     new_save_name = 'imgholder_' + model_type + 'model_' + str(image_holder.get_image_size_crop()) + 'crop'
