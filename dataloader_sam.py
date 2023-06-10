@@ -264,7 +264,7 @@ class Image_Holder():
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path):
-        full_path = path + str(round(self.ave_masks(),5)) + 'masks/'
+        full_path = path + '/maskcount' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         for  image in tqdm(self.images):
