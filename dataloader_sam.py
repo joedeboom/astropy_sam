@@ -23,6 +23,42 @@ def contains_image(fi):
             return True
     return False
 
+# Define helper functions
+def show_mask(mask, ax, random_color=False) :
+    if random_color:
+        color = np.concatenate([np.random.random(3), np.array([0.6])], axis=0)
+    else:
+        color = np.array([30/255, 144/255, 255/255, 0.6])
+    h, w = mask.shape[-2:]
+    mask_image = mask.reshape(h, w, 1) * color.reshape(1, 1, -1)
+    ax.imshow(mask_image)
+
+def show_points(coords, labels, ax, marker_size=375):
+    pos_points = coords[labels==1]
+    neg_points = coords[labels==0]
+    ax.scatter(pos_points[:, 0], pos_points[:, 1], color='green', marker='*', s=marker_size, edgecolor='white')  # line=?
+    ax.scatter(neg_points[:, 0], neg_points[:, 1], color='red', marker='*', s=marker_size, edgecolor='white')    # line=?
+
+def show_box(box, ax) :
+    x0, y0 = box[0], box[1]
+    w, h = box[2] - box[0], box[3] - box[1]
+    ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0,0,0,0) , lw=2))
+
+def show_anns(anns):
+    if len(anns) == 0:
+        return
+    sorted_anns = sorted(anns, key=(lambda x: x['area']), reverse=True)
+    ax = plt.gca()
+    ax.set_autoscale_on(False)
+
+    img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
+    img[:,:,3] = 0
+    for ann in sorted_anns:
+        m = ann['segmentation']
+        color_mask = np.concatenate([np.random.random(3), [0.35]])
+        img[m] = color_mask
+    ax.imshow(img)
+
 
 
 
@@ -113,8 +149,10 @@ class Image_Holder():
         if self.image_size_full % side_len != 0:
             print('Error. Invalid grid side length.')
             exit(1)
-        root_num_images = self.image_size_full / side_len
-        #for x in range(side_len / 2, self.image_size_full
+
+        for x in range(side_len // 2, self.image_size_full, side_len):
+            for y in range(side_len // 2, self.image_size_full, side_len):
+                imgs.append(Grid_Image((x,y), 'GRID', self.image_size_crop, self.image_size_full))
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function reads in the data from the provided csv files.
@@ -154,7 +192,7 @@ class Image_Holder():
                 if Ys[i] > top:
                     top = Ys[i]
             center = ((left + right) // 2, (top + bot) // 2)
-            imgs.append(Region_Image(center, 'HII', self.image_size_crop, self.image_size_full, {}))
+            imgs.append(Region_Image(center, 'HII', self.image_size_crop, self.image_size_full))
         for file in self.SNR_reg_files:
             regions = Regions.read(file, format='ds9')
             Xs = regions[0].vertices.x
@@ -174,7 +212,7 @@ class Image_Holder():
                 if Ys[i] > top:
                     top = Ys[i]
             center = ((left + right) // 2, (top + bot) // 2)
-            imgs.append(Region_Image(center, 'SNR', self.image_size_crop, self.image_size_full, {}))
+            imgs.append(Region_Image(center, 'SNR', self.image_size_crop, self.image_size_full))
         return imgs
 
     # Define a function to generate and save the actual cropped image data (not just the boundaries) for each image in the holder.
@@ -333,10 +371,27 @@ class Cropped_Image():
 
 
 
+# Create a Grid_Image child class.
+class Grid_Image(Cropped_Image):
+    def __init__(self, cen, file_type, crop_size, image_shape) -> None:
+        super().__init__(cen, file_type, crop_size, image_shape)
+    def __str__(self) -> str:
+        s = '\n\nRegion file.'
+        s += '\nID: ' + str(self.id)
+        s += '\nType: ' + self.type
+        s += '\nCenter: ' + str(self.center)
+        s += '\nBox: ' + str(self.box)
+        s += '\nSize of image: ' + str(sys.getsizeof(self.image))
+        s += '\nImage: ' + str(self.print_image())
+        s += '\nMask: ' + str(self.print_mask())
+        return s
+
+
+
+
 
 # Create a Region_Image child class.
 class Region_Image(Cropped_Image):
-    index = 0
     def __init__(self, cen, file_type, crop_size, image_shape) -> None:
         super().__init__(cen, file_type, crop_size, image_shape)
     def __str__(self) -> str:
@@ -355,7 +410,6 @@ class Region_Image(Cropped_Image):
 
 # Create a CSV_Image child class.
 class CSV_Image(Cropped_Image):
-    index = 0
     def __init__(self, csv, file_type, crop_size, image_shape) -> None:
         # Init Super
         super().__init__((float(csv['X_center']),float(csv['Y_center'])), file_type, crop_size, image_shape)

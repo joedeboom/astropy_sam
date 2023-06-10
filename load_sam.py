@@ -81,9 +81,16 @@ if __name__ == "__main__":
     mode = 'csv'
 
     # Obtain the image holder
-    print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path, mode)
+    print('Loading the image holder from ' + save_file_path + '...',end='\t')
+    image_holder = pickle.load(open('./imgholder_save', 'rb'))
+    if image_holder is not None:
+        print('Success!')
+    else:
+        print('Error loading the image holder.')
 
+
+
+    """
     # Generate the images in the image holder
     print('Generating the cropped images...')
     image_holder.generate_images()
@@ -116,9 +123,10 @@ if __name__ == "__main__":
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cropped_image.set_mask(mask_generator.generate(img))
-        
+    """    
+    
     # Save the plots to folder
-    print('Mask generation complete! Generating plots and saving to ' + save_plots_folder_path + '...')
+    print('Generating plots and saving to ' + save_plots_folder_path + '...')
     image_holder.save_plots(save_plots_folder_path)
 
     # Clear the image data
@@ -128,9 +136,9 @@ if __name__ == "__main__":
     #print(image_holder)
     
     # Define the image holder save name
-    new_save_name = 'imgholder_save'
-    print('Saving the image holder with the updated masks to ' + new_save_name)
-    with open(new_save_name, 'wb') as f:
-        pickle.dump(image_holder, f)
+    #new_save_name = 'imgholder_save'
+    #print('Saving the image holder with the updated masks to ' + new_save_name)
+    #with open(new_save_name, 'wb') as f:
+        #pickle.dump(image_holder, f)
 
 
