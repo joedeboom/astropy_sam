@@ -222,11 +222,16 @@ class Cropped_Image():
         return self.id
     def get_image(self):
         return self.image
+    def print_image(self):
+        if self.image is None:
+            return 'Not generated'
+        else:
+            return self.image
     def get_mask(self):
         return self.mask
     def print_mask(self):
         if self.mask is None:
-            return 'Not generated yet'
+            return 'Not generated yet.'
         else:
             return self.mask
     def __str__(self) -> str:
@@ -283,6 +288,7 @@ class Region_Image(Cropped_Image):
         s += '\nCenter: ' + str(self.center)
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
+        s += '\nImage: ' + str(self.print_image())
         s += '\nMask: ' + str(self.print_mask())
         return s
 
@@ -316,6 +322,7 @@ class CSV_Image(Cropped_Image):
         s += '\nRadius: ' +  str(self.get_radius())
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
+        s += '\nImage: ' + str(self.print_image())
         s += '\nMask: ' + str(self.print_mask())
         return s
 
