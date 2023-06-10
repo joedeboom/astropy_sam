@@ -182,7 +182,7 @@ class Image_Holder():
     # Define a function to check the validity of provided paths
     def check_paths(self):
         paths = [self.HII_folder_path, self.SNR_folder_path, self.HII_csv_path, self.SNR_csv_path, self.image_path]
-        print('Checking paths...'end='\t')
+        print('Checking paths...',end='\t')
         for path in paths:
             if not os.path.exists(path):
                 print('Error. Path does not exist: ' + path)
