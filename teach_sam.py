@@ -104,7 +104,7 @@ if __name__ == "__main__":
     
     print('\nGenerating masks...')
     for cropped_image in tqdm(image_holder.get_images()):
-        print(cropped_image)
+        #print(cropped_image)
         img = np.array(cropped_image.get_image())
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -114,7 +114,10 @@ if __name__ == "__main__":
     print(image_holder)
 
     # Clear the image data
+    print('Clearing the image data...')
     image_holder.clear_images()
+
+    print(image_holder)
 
     # Save the image holder (with updated masks) to file
     new_save_name = 'imgholder_' + model_type + 'model_' + str(image_holder.get_image_size_crop()) + 'crop'
