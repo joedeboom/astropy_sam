@@ -211,6 +211,18 @@ class Image_Holder():
                 exit(1)
         print('Success! All paths exist.')
 
+    # Define a function to save comparison plots of all images.
+    # This function will create a new directory inside the provided path and save the images inside it.
+    def save_plots(self, path):
+        full_path = path + str(round(image_holder.ave_masks(),5)) + 'masks/'
+        for  image in self.images:
+            images.generate_plot(full_path)
+
+
+
+
+
+
 
 
 
@@ -358,10 +370,29 @@ class CSV_Image(Cropped_Image):
         s += '\nImage: ' + str(self.print_image())
         s += '\nMask: ' + str(self.print_mask())
         return s
+    
+    # Define a function to generate and save plots to the corresponding file paths
+    def generate_plot(self, path):    
+        plt.subplots(figsize=(14,7))
+        chart_title = self.name + '  ' + self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.radius) + '   Mask Count: ' + str(len(self.mask))
+        plt.suptitle(chart_title)
 
+        plt.subplot(1,2,1)
+        plt.imshow(self.image.copy())
+        plt.axis('On')
+        plt.title('Source')
 
-
-
+        plt.subplot(1,2,2)
+        plt.imshow(self.image)
+        show_anns(self.mask)
+        plt.axis('On')
+        plt.title('Segmented')
+    
+        #plt.show()
+        dest_name = path + self.type + '_' + str(len(self.mask)) + '_' + self.name + '.png'
+        print('Saving to ' + dest_name)
+        plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+    
 
 
 

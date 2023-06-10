@@ -69,6 +69,8 @@ if __name__ == "__main__":
     HII_csv_path = './astropy_sam/old_model/csv/hii_regions.csv'
     SNR_csv_path = './astropy_sam/old_model/csv/snrs.csv'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
+    save_plots_folder_path = './cropped_imgs'
+
 
     # Define the mode. Determine to construct the images from region files or the csv files.
     mode = 'csv'
@@ -110,8 +112,9 @@ if __name__ == "__main__":
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cropped_image.set_mask(mask_generator.generate(img))
         
-    print('Mask generation complete! Printing final cropped image objects...')
-    print(image_holder)
+    # Save the plots to folder
+    print('Mask generation complete! Saving plots to ' + save_plots_folder_path + '...')
+    image_holder.save_plots(save_plots_folder_path)
 
     # Clear the image data
     print('Clearing the image data...')
