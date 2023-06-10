@@ -50,6 +50,9 @@ class Image_Holder():
         # Define the path to the full image
         self.image_path = img_path
 
+        #  check path validity
+        self.check_paths()
+
         # Additional initialization
         # Define the HII and SNR region files
         self.HII_reg_files = glob.glob(os.path.join(self.HII_folder_path, '*.reg'))
@@ -176,7 +179,13 @@ class Image_Holder():
                 count += 1
         print('Removed ' + str(count) + ' invalid files: ' + str(removed))
 
-
+    # Define a function to check the validity of provided paths
+    def check_paths(self):
+        paths = [self.HII_folder_path, self.SNR_folder_path, self.HII_csv_path, self.SNR_csv_path, self.image_path]
+        for path in paths:
+            if not os.path.exists(path):
+                print('Error. Path does not exist: ' + path)
+                exit(1)
 
 
 
