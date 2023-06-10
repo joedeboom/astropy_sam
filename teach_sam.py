@@ -120,7 +120,7 @@ if __name__ == "__main__":
     print(image_holder)
     
     # Define the image holder save name
-    new_save_name = 'imgholder_' + model_type + '_model_' + str(image_holder.get_image_size_crop()) + 'crop_' + str(image_holder.ave_masks() + 'maskAve'
+    new_save_name = 'imgholder_' + model_type + '_model_' + str(image_holder.get_image_size_crop()) + 'crop_' + str(image_holder.ave_masks()) + 'maskAve'
     print('Saving the image holder with the updated masks to ' + new_save_name)
     with open(new_save_name, 'wb') as f:
         pickle.dump(image_holder, f)
