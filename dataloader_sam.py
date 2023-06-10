@@ -91,10 +91,7 @@ class Image_Holder():
         s += '\nImage crop size: ' + str(self.image_size_crop)
         count = 0.0
         if self.images[0].get_mask() is not None:
-            for image in self.images:
-                count += len(image.get_mask())
-            ave = count / len(self.images)
-            s += '\nAverage mask count per image: ' + str(ave) + '\n'
+            s += '\nAverage mask count per image: ' + str(self.ave_masks()) + '\n'
         return s
     def ave_masks(self):
         count = 0.0
@@ -214,7 +211,7 @@ class Image_Holder():
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path):
-        full_path = path + str(round(image_holder.ave_masks(),5)) + 'masks/'
+        full_path = path + str(round(self.ave_masks(),5)) + 'masks/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         for  image in self.images:
