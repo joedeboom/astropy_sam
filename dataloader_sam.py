@@ -113,8 +113,8 @@ class Image_Holder():
         if self.image_size_full % side_len != 0:
             print('Error. Invalid grid side length.')
             exit(1)
-        root_num_img = self.image_size_full / self.image_size-Crop
-
+        root_num_images = self.image_size_full / side_len
+        #for x in range(side_len / 2, self.image_size_full
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function reads in the data from the provided csv files.
@@ -388,7 +388,7 @@ class CSV_Image(Cropped_Image):
     # Define a function to generate and save plots to the corresponding file paths
     def generate_plot(self, path):    
         plt.subplots(figsize=(14,7))
-        chart_title = self.name + '  ' + self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.radius) + '   Mask Count: ' + str(len(self.mask))
+        chart_title = self.get_name() + '  ' + self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Mask Count: ' + str(len(self.mask))
         plt.suptitle(chart_title)
 
         plt.subplot(1,2,1)
@@ -403,7 +403,7 @@ class CSV_Image(Cropped_Image):
         plt.title('Segmented')
     
         #plt.show()
-        dest_name = path + self.type + '_' + str(len(self.mask)) + '_' + self.name + '.png'
+        dest_name = path + self.type + '_' + str(len(self.mask)) + '_' + self.get_name() + '.png'
         print('Saving to ' + dest_name)
         plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
     
