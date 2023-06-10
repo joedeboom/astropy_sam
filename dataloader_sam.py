@@ -310,7 +310,7 @@ class CSV_Image(Cropped_Image):
         return float(self.csv_data['Radius'])
     def __str__(self) -> str:
         s = '\n\nCSV file'
-        s = '\nID: ' + str(self.id)
+        s += '\nID: ' + str(self.id)
         s += '\nType: ' + self.type
         s += '\nCenter: ' + str(self.center)
         s += '\nRadius: ' +  str(self.get_radius())
