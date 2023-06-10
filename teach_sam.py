@@ -116,10 +116,11 @@ if __name__ == "__main__":
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cropped_image.set_mask(mask_generator.generate(img))
-        
+    print('Mask generation complete!')
+
     # Save the plots to folder
-    print('Mask generation complete! Generating plots and saving to ' + save_plots_folder_path + '...')
-    image_holder.save_plots(save_plots_folder_path)
+    #print('Generating plots and saving to ' + save_plots_folder_path + '...')
+    #image_holder.save_plots(save_plots_folder_path)
 
     # Clear the image data
     #print('Clearing the image data...')
