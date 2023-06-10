@@ -69,7 +69,7 @@ if __name__ == "__main__":
     HII_csv_path = './astropy_sam/old_model/csv/hii_regions.csv'
     SNR_csv_path = './astropy_sam/old_model/csv/snrs.csv'
     image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
-    save_plots_folder_path = './cropped_imgs'
+    save_plots_folder_path = './astropy_sam/cropped_imgs'
     
     # Check the save plot folder path
     if not os.path.exists(save_plots_folder_path):
