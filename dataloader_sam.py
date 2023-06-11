@@ -268,10 +268,20 @@ class Image_Holder():
         full_path = path + '/' + self.mode + '-maskcount' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
+        multi_mask_images = []
         for  image in self.images:
             image.generate_plot(full_path)
+            if len(image.get_mask()) > 1:
+                multi_mask_images.append(image)
 
-
+        f = open(full_path + 'stats.txt')
+        s = ''
+        for image in multi_mask_images:
+            s += image.get_name() + '\n'
+        s += '\n\nImage Holder:\n'
+        s += str(self)
+        f.write(s)
+        f.close()
 
 
 
