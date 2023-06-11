@@ -521,7 +521,7 @@ class CSV_Image(Cropped_Image):
         plt.title('Source')
 
         plt.subplot(1,2,2)
-        #plt.imshow(self.image)
+        plt.imshow(self.image)
         #show_anns(self.mask)
         # Beginning of edit
         sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
