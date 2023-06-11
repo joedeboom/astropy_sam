@@ -526,7 +526,7 @@ class CSV_Image(Cropped_Image):
         # Beginning of edit
         sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
         
-        plt.set_autoscale_on(False)
+        #plt.set_autoscale_on(False)
 
         img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
         img[:,:,3] = 0
