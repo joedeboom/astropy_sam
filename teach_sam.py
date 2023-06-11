@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # Define the radius scale factor.
     # If scale factor == 1, the default image size (defined above) will be used.
-    scale_factor = 2
+    scale_factor = 4
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided.
