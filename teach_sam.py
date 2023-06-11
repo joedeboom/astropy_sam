@@ -49,8 +49,8 @@ if __name__ == "__main__":
     }
 
     # Check the save plot folder path. Remaining paths are checked in image holder constructor.
-    if not os.path.exists(save_plots_folder_path):
-        print('Error. Path does not exist: ' + save_plots_folder_path)
+    if not os.path.exists(paths['save_plots_folder_path']):
+        print('Error. Path does not exist: ' + paths['save_plots_folder_path'])
         exit(1)
 
 
