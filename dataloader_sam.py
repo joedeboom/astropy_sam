@@ -66,7 +66,6 @@ def show_anns(anns):
 # Define an image holder class
 class Image_Holder():
     def __init__(self, size, image_shape, paths, mode, scale_factor, data_reduction) -> None:
-        print(paths)
         # Define the mode for the image holder
         self.mode = mode
 
@@ -95,12 +94,6 @@ class Image_Holder():
         # Define the path to the full image
         self.image_path = paths['image_path']
         
-        print(self.HII_folder_path)
-        print(self.SNR_folder_path)
-        print(self.HII_csv_path)
-        print(self.SNR_csv_path)
-        print(self.image_path)
-
         # Check path  validity
         self.check_paths()
 
@@ -183,7 +176,7 @@ class Image_Holder():
                 count += 1
         with open(self.SNR_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            count = self.data_redutcion
+            count = self.data_reduction
             for row in reader:
                 if count % self.data_reduction == 0:
                     imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor))
