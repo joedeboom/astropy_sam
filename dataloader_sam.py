@@ -126,19 +126,17 @@ class Image_Holder():
         return self.image_size_full
     def get_images(self) -> list:
         return self.images
-    def __str__(self, abrv=True) -> str:
+    def __str__(self) -> str:
         s = self.print_stats()
         for image in self.images:
-            if abrv:
-                if image.get_id() % (50 // self.data_reduction) == 0:
-                    s += str(image)
-            else:
-                s += str(img)
+            if image.get_id() % (50 // self.data_reduction) == 0:
+                s += str(image)
         return s
     def print_stats(self) -> str:
         s = '\n\nImage count: ' + str(len(self.images))
         s += '\nImage crop size: ' + str(self.image_size_crop)
         s += '\nScale factor: ' + str(self.scale_factor)
+        s += '\nData reduction: ' + str(self.data_reduction)
         count = 0.0
         if self.images[0].get_mask() is not None:
             s += '\nAverage mask count per image: ' + str(self.ave_masks()) + '\n'
@@ -279,6 +277,20 @@ class Image_Holder():
                 exit(1)
         print('Success! All paths exist.')
 
+    # Define a function to output all stats to file
+    def write_stats(self, path):
+        f = open(path, 'w')
+        s = 'Files with multiple masks:\n'
+        for image in multi_mask_images:
+            s += image.get_name() + '\n'
+        s += '\n\n'
+        s += self.print_stats()
+        for image in self.images:
+            s += str(image)
+        f.write(s)
+        f.close()
+
+
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path):
@@ -291,14 +303,7 @@ class Image_Holder():
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
 
-        f = open(full_path + 'stats.txt', 'w')
-        s = 'Files with multiple masks:'
-        for image in multi_mask_images:
-            s += image.get_name() + '\n'
-        s += '\n\nImage Holder:\n'
-        s += str(self, abrv=False)
-        f.write(s)
-        f.close()
+        self.write_stats(full_path + 'stats.txt')
 
 
 
