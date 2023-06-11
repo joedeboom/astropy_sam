@@ -104,6 +104,9 @@ class Image_Holder():
         print(self.SNR_csv_path)
         print(self.image_path)
 
+        # Check path  validity
+        self.check_paths()
+
         # Define the HII and SNR region files
         self.HII_reg_files = glob.glob(os.path.join(self.HII_folder_path, '*.reg'))
         self.SNR_reg_files = glob.glob(os.path.join(self.SNR_folder_path, '*.reg'))
