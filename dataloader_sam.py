@@ -131,7 +131,7 @@ class Image_Holder():
     def print_stats(self) -> str:
         s = '\n\nImage count: ' + str(len(self.images))
         s += '\nImage crop size: ' + str(self.image_size_crop)
-        s += '\nScale factor: ' str(self.scale_factor)
+        s += '\nScale factor: ' + str(self.scale_factor)
         count = 0.0
         if self.images[0].get_mask() is not None:
             s += '\nAverage mask count per image: ' + str(self.ave_masks()) + '\n'
