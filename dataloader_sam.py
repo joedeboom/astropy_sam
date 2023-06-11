@@ -84,9 +84,6 @@ class Image_Holder():
         # Define the data reduction factor
         self.data_reduction = data_reduction
         
-        # Check path  validity
-        self.check_paths()
-
         # Define the HII and SNR region folder paths
         self.HII_folder_path = paths['HII_folder_path']
         self.SNR_folder_path = paths['SNR_folder_path']
