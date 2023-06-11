@@ -282,7 +282,7 @@ class Image_Holder():
         f = open(path, 'w')
         s = 'Files with multiple masks:\n'
         for image in multi_mask_images:
-            s += image.get_name() + '\n'
+            s += 'ID-' + str(image.get_id()) + '\n'
         s += '\n\n'
         s += self.print_stats()
         for image in self.images:
@@ -520,7 +520,7 @@ class CSV_Image(Cropped_Image):
         plt.title('Source')
 
         plt.subplot(1,2,2)
-        #plt.imshow(self.image)
+        plt.imshow(self.image)
         show_anns(self.mask)
         plt.axis('On')
         plt.title('Segmented')
