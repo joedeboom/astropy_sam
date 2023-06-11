@@ -278,7 +278,7 @@ class Image_Holder():
         print('Success! All paths exist.')
 
     # Define a function to output all stats to file
-    def write_stats(self, path):
+    def write_stats(self, path, multi_mask_images):
         f = open(path, 'w')
         s = 'Files with multiple masks:\n'
         for image in multi_mask_images:
@@ -303,7 +303,7 @@ class Image_Holder():
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
 
-        self.write_stats(full_path + 'stats.txt')
+        self.write_stats(full_path + 'stats.txt', multi_mask_images)
 
 
 
