@@ -506,7 +506,7 @@ class CSV_Image(Cropped_Image):
 
     # Define a function to generate and save plots to the corresponding file paths
     def generate_plot(self, path):    
-        dest_name = path + self.type + '_' + str(len(self.mask)) + '_' + self.get_name() + '.png'
+        dest_name = path + self.type + '_' + self.get_name() + '_ID-' + str(self.get_id())'.png'
         if os.path.isfile(dest_name):
             return
 
