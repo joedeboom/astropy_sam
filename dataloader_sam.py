@@ -139,7 +139,7 @@ class Image_Holder():
     def __str__(self) -> str:
         s = self.print_stats()
         for image in self.images:
-            if image.get_id() % 50 == 0:
+            if image.get_id() % (50 // self.scale_factor) == 0:
                 s += str(image)
         return s
     def print_stats(self) -> str:
