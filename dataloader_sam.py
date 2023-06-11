@@ -97,6 +97,12 @@ class Image_Holder():
 
         # Define the path to the full image
         self.image_path = paths['image_path']
+        
+        print(self.HII_folder_path)
+        print(self.SNR_folder_path)
+        print(self.HII_csv_path)
+        print(self.SNR_csv_path)
+        print(self.image_path)
 
         # Define the HII and SNR region files
         self.HII_reg_files = glob.glob(os.path.join(self.HII_folder_path, '*.reg'))
