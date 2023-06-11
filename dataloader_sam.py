@@ -526,8 +526,6 @@ class CSV_Image(Cropped_Image):
         plt.title('Segmented')
     
         #plt.show()
-        dest_name = path + self.type + '_' + str(len(self.mask)) + '_' + self.get_name() + '.png'
-        #print('Saving to ' + dest_name)
         plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
     
         plt.close()
