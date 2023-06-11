@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
 
     # Experiment with fits
-    hdul = fits.open(image_path)
+    hdul = fits.open(paths['image_path'])
     hdul.info()
 
     hdul.close()
