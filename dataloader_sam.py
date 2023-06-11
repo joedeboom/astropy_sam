@@ -274,7 +274,7 @@ class Image_Holder():
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
 
-        f = open(full_path + 'stats.txt')
+        f = open(full_path + 'stats.txt', 'w')
         s = ''
         for image in multi_mask_images:
             s += image.get_name() + '\n'
