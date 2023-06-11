@@ -47,7 +47,7 @@ if __name__ == "__main__":
         'image_path': './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits',
         'save_plots_folder_path': './astropy_sam/cropped_imgs'
     }
-
+    print(paths)
     # Check the save plot folder path. Remaining paths are checked in image holder constructor.
     if not os.path.exists(paths['save_plots_folder_path']):
         print('Error. Path does not exist: ' + paths['save_plots_folder_path'])

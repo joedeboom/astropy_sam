@@ -66,6 +66,7 @@ def show_anns(anns):
 # Define an image holder class
 class Image_Holder():
     def __init__(self, size, image_shape, paths, mode, scale_factor, data_reduction) -> None:
+        print(paths)
         # Define the mode for the image holder
         self.mode = mode
 
