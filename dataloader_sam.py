@@ -162,11 +162,11 @@ class Image_Holder():
         with open(self.HII_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                imgs.append(CSV_Image(row, 'HII', self.image_size_crop, self.image_size_full))
+                imgs.append(CSV_Image(row, 'HII', self.image_size_crop, self.image_size_full, True))
         with open(self.SNR_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full))
+                imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full, True))
         return imgs
 
 
@@ -411,14 +411,17 @@ class Region_Image(Cropped_Image):
 
 # Create a CSV_Image child class.
 class CSV_Image(Cropped_Image):
-    def __init__(self, csv, file_type, crop_size, image_shape) -> None:
+    def __init__(self, csv, file_type, crop_size, image_shape, var_size) -> None:
         # Init Super
         super().__init__((float(csv['X_center']),float(csv['Y_center'])), file_type, crop_size, image_shape)
 
         # Define the raw csv dictionary data
         # {'': '0', 'Name': 'MCELS-L1', 'X_center': '13668.075', 'Y_center': '7012.1650', 'Radius': '12.500000'}
         self.csv_data = csv
-    
+        
+        if var_size:
+            self.box = self.regenerate_boundary(image_shape)    
+
     def get_name(self):
         return self.csv_data['Name']
     def get_X_center(self):
@@ -439,7 +442,36 @@ class CSV_Image(Cropped_Image):
         s += '\nImage: ' + str(self.print_image())
         s += '\nMask: ' + str(self.print_mask())
         return s
-    
+
+    def regenerate_boundary(self, full_size) -> None:
+        # Define a function to generate the cropped images to pass into the model.
+        # Input: the center coordinates of the region to be cropped
+        # Returns: the boxed region
+        #
+        # x1,y1-----------*
+        #  |              |
+        #  |              |
+        #  |              |
+        #  |              |
+        #  *------------x2,y2
+        #
+        x, y = self.center
+        radius = self.radius * 1.25
+        x1 = x - radius
+        if x1 < 0:
+            x1 = 0
+        y1 = y - radius
+        if y1 < 0:
+            y1 = 0
+        x2 = x + radius
+        if x2 > full_size:
+            x2 = full_size
+        y2 = y + radius
+        if y2 > full_size:
+            y2 = full_size
+        b = {'p1':(int(x1),int(y1)), 'p2':(int(x2),int(y2))}
+        return b
+
     # Define a function to generate and save plots to the corresponding file paths
     def generate_plot(self, path):    
         plt.subplots(figsize=(14,7))

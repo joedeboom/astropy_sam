@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
 
     # Define the mode. Determine to construct the images from region files, csv files or grid.
-    mode = 'grid'
+    mode = 'csv'
 
     # Obtain the image holder
     print('Obtaining the image holder...')
