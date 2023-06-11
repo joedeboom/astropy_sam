@@ -269,7 +269,7 @@ class Image_Holder():
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         multi_mask_images = []
-        for  image in self.images:
+        for  image in tqdm(self.images):
             image.generate_plot(full_path)
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
@@ -501,7 +501,7 @@ class CSV_Image(Cropped_Image):
     
         #plt.show()
         dest_name = path + self.type + '_' + str(len(self.mask)) + '_' + self.get_name() + '.png'
-        print('Saving to ' + dest_name)
+        #print('Saving to ' + dest_name)
         plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
     
         plt.close()
