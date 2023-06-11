@@ -65,12 +65,15 @@ def show_anns(anns):
 
 # Define an image holder class
 class Image_Holder():
-    def __init__(self, size, image_shape, hii_folder_path, snr_folder_path, hii_csv_path, snr_csv_path, img_path, mode) -> None:
+    def __init__(self, size, image_shape, hii_folder_path, snr_folder_path, hii_csv_path, snr_csv_path, img_path, mode, scale_factor) -> None:
         # Define the mode for the image holder
         self.mode = mode
 
         # Define the cropped image size
         self.image_size_crop = size
+        
+        # Define the radius scale factor
+        self.scale_factor = scale_factor
 
         # Define the full image size
         self.image_size_full = image_shape
@@ -128,6 +131,7 @@ class Image_Holder():
     def print_stats(self) -> str:
         s = '\n\nImage count: ' + str(len(self.images))
         s += '\nImage crop size: ' + str(self.image_size_crop)
+        s += '\nScale factor: ' str(self.scale_factor)
         count = 0.0
         if self.images[0].get_mask() is not None:
             s += '\nAverage mask count per image: ' + str(self.ave_masks()) + '\n'
@@ -162,11 +166,11 @@ class Image_Holder():
         with open(self.HII_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                imgs.append(CSV_Image(row, 'HII', self.image_size_crop, self.image_size_full, True))
+                imgs.append(CSV_Image(row, 'HII', self.image_size_crop, self.image_size_full, self.scale_factor))
         with open(self.SNR_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full, True))
+                imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor))
         return imgs
 
 
@@ -275,7 +279,7 @@ class Image_Holder():
                 multi_mask_images.append(image)
 
         f = open(full_path + 'stats.txt', 'w')
-        s = ''
+        s = 'Files with multiple masks:'
         for image in multi_mask_images:
             s += image.get_name() + '\n'
         s += '\n\nImage Holder:\n'
@@ -421,7 +425,7 @@ class Region_Image(Cropped_Image):
 
 # Create a CSV_Image child class.
 class CSV_Image(Cropped_Image):
-    def __init__(self, csv, file_type, crop_size, image_shape, var_size) -> None:
+    def __init__(self, csv, file_type, crop_size, image_shape, scale_factor) -> None:
         # Init Super
         super().__init__((float(csv['X_center']),float(csv['Y_center'])), file_type, crop_size, image_shape)
 
@@ -429,8 +433,8 @@ class CSV_Image(Cropped_Image):
         # {'': '0', 'Name': 'MCELS-L1', 'X_center': '13668.075', 'Y_center': '7012.1650', 'Radius': '12.500000'}
         self.csv_data = csv
         
-        if var_size:
-            self.box = self.regenerate_boundary(image_shape)    
+        if scale_factor != 1:
+            self.box = self.regenerate_boundary(image_shape, scale_factor)    
 
     def get_name(self):
         return self.csv_data['Name']
@@ -453,7 +457,7 @@ class CSV_Image(Cropped_Image):
         s += '\nMask: ' + str(self.print_mask())
         return s
 
-    def regenerate_boundary(self, full_size) -> None:
+    def regenerate_boundary(self, full_size, scale_factor) -> None:
         # Define a function to generate the cropped images to pass into the model.
         # Input: the center coordinates of the region to be cropped
         # Returns: the boxed region
@@ -466,7 +470,7 @@ class CSV_Image(Cropped_Image):
         #  *------------x2,y2
         #
         x, y = self.center
-        radius = self.get_radius() * 1.25
+        radius = self.get_radius() * scale_factor
         x1 = x - radius
         if x1 < 0:
             x1 = 0

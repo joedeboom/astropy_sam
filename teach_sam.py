@@ -23,7 +23,11 @@ if __name__ == "__main__":
 
     # Define cropped image size
     size = 180
-    
+
+    # Define the radius scale factor.
+    # If scale factor == 1, the default image size (defined above) will be used.
+    scale_factor = 2
+
     # Define full image shape
     image_shape = 16740
     
@@ -46,7 +50,7 @@ if __name__ == "__main__":
 
     # Obtain the image holder
     print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path, mode)
+    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path, mode, scale_factor)
 
     # Generate the images in the image holder
     print('Generating the cropped images...')
