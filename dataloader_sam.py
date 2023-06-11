@@ -269,7 +269,7 @@ class Image_Holder():
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path):
-        full_path = path + '/' + self.mode + '_scale-' + str(self.scale_factor).replace('.','-' + '_maskcount-' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
+        full_path = path + '/' + self.mode + '_scale-' + str(self.scale_factor).replace('.','-') + '_maskcount-' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         multi_mask_images = []
