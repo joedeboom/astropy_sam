@@ -65,34 +65,38 @@ def show_anns(anns):
 
 # Define an image holder class
 class Image_Holder():
-    def __init__(self, size, image_shape, hii_folder_path, snr_folder_path, hii_csv_path, snr_csv_path, img_path, mode, scale_factor) -> None:
+    def __init__(self, size, image_shape, paths, mode, scale_factor, data_reduction) -> None:
         # Define the mode for the image holder
         self.mode = mode
 
         # Define the cropped image size
         self.image_size_crop = size
         
-        # Define the radius scale factor
-        self.scale_factor = scale_factor
-
         # Define the full image size
         self.image_size_full = image_shape
+
+        # Define the radius scale factor
+        # Images will be cropped by scale factor * radius
+        # If scale factor = 1, the image size crop will be used by default
+        self.scale_factor = scale_factor
+
+        # Define the data reduction factor
+        self.data_reduction = data_reduction
         
-        # Define the HII and SNR region folder paths
-        self.HII_folder_path = hii_folder_path
-        self.SNR_folder_path = snr_folder_path
-
-        # Define the hii and snr csv paths
-        self.HII_csv_path = hii_csv_path
-        self.SNR_csv_path = snr_csv_path
-
-        # Define the path to the full image
-        self.image_path = img_path
-
-        #  check path validity
+        # Check path  validity
         self.check_paths()
 
-        # Additional initialization
+        # Define the HII and SNR region folder paths
+        self.HII_folder_path = paths['HII_folder_path']
+        self.SNR_folder_path = path['SNR_folder_path']
+
+        # Define the hii and snr csv paths
+        self.HII_csv_path = path['HII_csv_path']
+        self.SNR_csv_path = path['SNR_csv_path']
+
+        # Define the path to the full image
+        self.image_path = path['image_path']
+
         # Define the HII and SNR region files
         self.HII_reg_files = glob.glob(os.path.join(self.HII_folder_path, '*.reg'))
         self.SNR_reg_files = glob.glob(os.path.join(self.SNR_folder_path, '*.reg'))
@@ -165,12 +169,18 @@ class Image_Holder():
         imgs = []
         with open(self.HII_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
+            count = self.data_reduction
             for row in reader:
-                imgs.append(CSV_Image(row, 'HII', self.image_size_crop, self.image_size_full, self.scale_factor))
+                if count % self.data_reduction == 0:
+                    imgs.append(CSV_Image(row, 'HII', self.image_size_crop, self.image_size_full, self.scale_factor))
+                count += 1
         with open(self.SNR_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
+            count = self.data_redutcion
             for row in reader:
-                imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor))
+                if count % self.data_reduction == 0:
+                    imgs.append(CSV_Image(row, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor))
+                count += 1
         return imgs
 
 

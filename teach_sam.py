@@ -21,36 +21,42 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 # Define main function
 if __name__ == "__main__":
 
+    # Define the mode. Determine to construct the images from region files, csv files or grid
+    mode = 'csv'
+
     # Define cropped image size
     size = 180
+
+    # Define full image shape
+    image_shape = 16740
 
     # Define the radius scale factor.
     # If scale factor == 1, the default image size (defined above) will be used.
     scale_factor = 2
 
-    # Define full image shape
-    image_shape = 16740
+    # Define the reduced dataset.
+    # The dataset size will be reduced by the factor provided.
+    data_reduction = 10
     
     # Define data paths
-    HII_folder_path = './drive/MyDrive/Research/LMC/HII_boundaries'
-    SNR_folder_path = './drive/MyDrive/Research/LMC/SNR_boundaries'
-    HII_csv_path = './astropy_sam/old_model/csv/hii_regions.csv'
-    SNR_csv_path = './astropy_sam/old_model/csv/snrs.csv'
-    image_path = './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
-    save_plots_folder_path = './astropy_sam/cropped_imgs'
+    paths = {
+        'HII_folder_path': './drive/MyDrive/Research/LMC/HII_boundaries'
+        'SNR_folder_path': './drive/MyDrive/Research/LMC/SNR_boundaries'
+        'HII_csv_path': './astropy_sam/old_model/csv/hii_regions.csv'
+        'SNR_csv_path': './astropy_sam/old_model/csv/snrs.csv'
+        'image_path': './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits'
+        'save_plots_folder_path': './astropy_sam/cropped_imgs'
     
-    # Check the save plot folder path
+    # Check the save plot folder path. Remaining paths are checked in image holder constructor.
     if not os.path.exists(save_plots_folder_path):
         print('Error. Path does not exist: ' + save_plots_folder_path)
         exit(1)
 
 
-    # Define the mode. Determine to construct the images from region files, csv files or grid.
-    mode = 'csv'
 
     # Obtain the image holder
     print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, HII_folder_path, SNR_folder_path, HII_csv_path, SNR_csv_path, image_path, mode, scale_factor)
+    image_holder = Image_Holder(size, image_shape, paths, mode, scale_factor, data_reduction)
 
     # Generate the images in the image holder
     print('Generating the cropped images...')
