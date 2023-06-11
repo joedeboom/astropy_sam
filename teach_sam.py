@@ -49,10 +49,10 @@ if __name__ == "__main__":
     }
 
     print('Mode: ' + mode)
-    print('Crop size: ' + size)
-    print('Image shape: ' + image_shape)
-    print('Scale factor: ' + scale_factor)
-    print('Data reduction: ' + data_reduction)
+    print('Crop size: ' + str(size))
+    print('Image shape: ' + str(image_shape))
+    print('Scale factor: ' + str(scale_factor))
+    print('Data reduction: ' + str(data_reduction))
 
     # Check the save plot folder path. Remaining paths are checked in image holder constructor.
     if not os.path.exists(paths['save_plots_folder_path']):
