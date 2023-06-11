@@ -126,11 +126,14 @@ class Image_Holder():
         return self.image_size_full
     def get_images(self) -> list:
         return self.images
-    def __str__(self) -> str:
+    def __str__(self, abrv=True) -> str:
         s = self.print_stats()
         for image in self.images:
-            if image.get_id() % (50 // self.data_reduction) == 0:
-                s += str(image)
+            if abrv:
+                if image.get_id() % (50 // self.data_reduction) == 0:
+                    s += str(image)
+            else:
+                s += str(img)
         return s
     def print_stats(self) -> str:
         s = '\n\nImage count: ' + str(len(self.images))
@@ -293,7 +296,7 @@ class Image_Holder():
         for image in multi_mask_images:
             s += image.get_name() + '\n'
         s += '\n\nImage Holder:\n'
-        s += str(self)
+        s += str(self, abrv=False)
         f.write(s)
         f.close()
 
@@ -512,7 +515,7 @@ class CSV_Image(Cropped_Image):
         plt.title('Source')
 
         plt.subplot(1,2,2)
-        plt.imshow(self.image)
+        #plt.imshow(self.image)
         show_anns(self.mask)
         plt.axis('On')
         plt.title('Segmented')
