@@ -472,6 +472,7 @@ class CSV_Image(Cropped_Image):
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
         s += '\nImage: ' + str(self.print_image())
+        s += '\nMask count: ' + str(len(self.print_mask()))
         s += '\nMask: ' + str(self.print_mask())
         return s
 
@@ -520,12 +521,12 @@ class CSV_Image(Cropped_Image):
         plt.title('Source')
 
         plt.subplot(1,2,2)
-        plt.imshow(self.image)
+        #plt.imshow(self.image)
         #show_anns(self.mask)
         # Beginning of edit
-        sorted_anns = sorted(self.mask, key=(lambda x: x['area']), reverse=True)
-        ax = plt.gca()
-        ax.set_autoscale_on(False)
+        sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
+        
+        plt.set_autoscale_on(False)
 
         img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
         img[:,:,3] = 0
@@ -533,7 +534,7 @@ class CSV_Image(Cropped_Image):
             m = ann['segmentation']
             color_mask = np.concatenate([np.random.random(3), [0.35]])
             img[m] = color_mask
-        ax.imshow(img)
+        plt.imshow(img)
 
 
 
