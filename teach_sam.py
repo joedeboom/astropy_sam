@@ -67,7 +67,7 @@ if __name__ == "__main__":
         }
 
     
-    print('Parameters:')
+    print('Parameters')
     print('Mode: ' + mode)
     print('Crop size: ' + str(size))
     print('Image shape: ' + str(image_shape))

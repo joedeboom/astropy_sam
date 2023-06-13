@@ -67,7 +67,7 @@ if __name__ == "__main__":
         }
 
     
-    print('Parameters:')
+    print('Parameters')
     print('Mode: ' + mode)
     print('Crop size: ' + str(size))
     print('Image shape: ' + str(image_shape))
@@ -123,7 +123,7 @@ if __name__ == "__main__":
         x = cropped_image.get_image_center()
         label = 1 #if cropped_image.get_type() == 'HII' else 2
         input_point = np.array([[x,x]])
-        input_label = label
+        input_label = np.array([label])
 
         masks, scores, logits = predictor.predict(
             point_coords=input_point,
