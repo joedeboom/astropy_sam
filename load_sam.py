@@ -23,6 +23,9 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 if __name__ == "__main__":
     
     save_plots_folder_path = './astropy_sam/cropped_imgs'
+    
+    # Local
+    save_plots_folder_path = './cropped_imgs'
 
     # Obtain the image holder
     save_file_path = './imgholder_save'

@@ -13,6 +13,7 @@ from regions import Regions
 from astropy.io import fits
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import pprint
 
 # define a function to check if the provided region file uses an image coordinate system
 # Used in the Image_Holder initialization to help remove the invalid coordinate region files
@@ -129,7 +130,10 @@ class Image_Holder():
     def __str__(self) -> str:
         s = self.print_stats()
         for image in self.images:
-            if image.get_id() % (50 // self.data_reduction) == 0:
+            if self.data_reduction < 51:
+                if image.get_id() % (50 // self.data_reduction) == 0:
+                    s += str(image)
+            else:
                 s += str(image)
         return s
     def print_stats(self) -> str:
@@ -341,6 +345,10 @@ class Cropped_Image():
         # Define the mask for the image
         self.mask = None
 
+        # Define the SAM predictor scores and logits for the image
+        self.predict_scores = None
+        self.logits = None
+
     def get_center(self):
         return self.center
     def get_box(self):
@@ -362,7 +370,11 @@ class Cropped_Image():
         if self.mask is None:
             return 'Not generated yet.'
         else:
-            return self.mask
+            return pprint.pformat(self.mask)
+    def get_predict_scores(self):
+        return self.predict_scores
+    def get_logits(self):
+        return self.logits
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image)) + '\nMask: \n' + str(self.mask)
         return s
@@ -372,6 +384,10 @@ class Cropped_Image():
         self.image = None
     def set_mask(self, m) -> None:
         self.mask = m
+    def set_predict_scores(self, p):
+        self.predict_scores = p
+    def set_logits(self, l):
+        self.logits = l
     def generate_boundary(self, crop_size, full_size) -> None:
         # Define a function to generate the cropped images to pass into the model.
         # Input: the center coordinates of the region to be cropped
@@ -510,44 +526,51 @@ class CSV_Image(Cropped_Image):
         dest_name = path + self.type + '_' + self.get_name() + '_ID-' + str(self.get_id()) + '.png'
         if os.path.isfile(dest_name):
             return
-
-        plt.subplots(figsize=(14,7))
-        chart_title = self.get_name() + '  ' + self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Mask Count: ' + str(len(self.mask))
-        plt.suptitle(chart_title)
-
-        plt.subplot(1,2,1)
-        plt.imshow(self.image.copy())
-        plt.axis('On')
-        plt.title('Source')
-
-        plt.subplot(1,2,2)
-        plt.imshow(self.image)
-        #show_anns(self.mask)
-        # Beginning of edit
-        sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
         
-        #plt.set_autoscale_on(False)
+        # Determine if it is automatic SAM
+        if self.predict_scores is None:
+            plt.subplots(figsize=(14,7))
+            chart_title = self.get_name() + '  ' + self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Mask Count: ' + str(len(self.mask))
+            plt.suptitle(chart_title)
 
-        img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
-        img[:,:,3] = 0
-        for ann in sorted_anns:
-            m = ann['segmentation']
-            color_mask = np.concatenate([np.random.random(3), [0.35]])
-            img[m] = color_mask
-        plt.imshow(img)
+            plt.subplot(1,2,1)
+            plt.imshow(self.image.copy())
+            plt.axis('On')
+            plt.title('Source')
 
+            plt.subplot(1,2,2)
+            #plt.imshow(self.image)
+            sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
+        
+            #plt.set_autoscale_on(False)
 
+            img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
+            img[:,:,3] = 0
+            for ann in sorted_anns:
+                m = ann['segmentation']
+                color_mask = np.concatenate([np.random.random(3), [0.35]])
+                img[m] = color_mask
+            plt.imshow(img)
 
-        plt.axis('On')
-        plt.title('Segmented')
+            plt.axis('On')
+            plt.title('Segmented')
     
-        #plt.show()
-        plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+            #plt.show()
+            plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
     
-        plt.close()
+            plt.close()
 
-
-
+        else:
+            # Is Predictor SAM
+            for i, (mask, score) in enumerate(zip(self.mask, self.predict_scores)):
+                plt.figure(figsize=(10,10))
+                plt.imshow(self.image)
+                show_mask(mask, plt.gca())
+                show_points(input_point, input_label, plt.gca())
+                plt.title(f"Mask {i+1}, Score: {score:.3f}", fontsize=18)
+                plt.axis('On')
+                #plt.show()
+                plt.savefig(dest_name + '_' + str(i), dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
 
 
 

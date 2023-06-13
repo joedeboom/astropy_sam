@@ -41,9 +41,6 @@ if __name__ == "__main__":
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
 
-    # Define if the program will run locally
-    local = False
-
     # Define data paths (for cloud)
     paths = {
         'HII_folder_path': './drive/MyDrive/Research/LMC/HII_boundaries',
@@ -56,15 +53,14 @@ if __name__ == "__main__":
 
 
     # Define data paths (for local  machine)
-    if local:
-        paths = {
-            'HII_folder_path': './LMC/HII_boundaries',
-            'SNR_folder_path': './LMC/SNR_boundaries',
-            'HII_csv_path': './old_model/csv/hii_regions.csv',
-            'SNR_csv_path': './old_model/csv/snrs.csv',
-            'image_path': './LMC/lmc_askap_aconf.fits',
-            'save_plots_folder_path': './cropped_imgs'
-        }
+    paths = {
+        'HII_folder_path': './LMC/HII_boundaries',
+        'SNR_folder_path': './LMC/SNR_boundaries',
+        'HII_csv_path': './old_model/csv/hii_regions.csv',
+        'SNR_csv_path': './old_model/csv/snrs.csv',
+        'image_path': './LMC/lmc_askap_aconf.fits',
+        'save_plots_folder_path': './cropped_imgs'
+    }
 
     
     print('Parameters:')
@@ -108,23 +104,33 @@ if __name__ == "__main__":
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     print('Sending SAM to ' + device)
     sam.to(device=device)
-    print('Creating automatic mask generator...')
-    mask_generator = SamAutomaticMaskGenerator(
-        model=sam,
-        points_per_side=32,
-        pred_iou_thresh=0.8,
-        stability_score_thresh=0.8,
-        crop_n_layers=0,
-        crop_n_points_downscale_factor=2,
-        #min_mask_region_area=100,  # Requires open-cv to run post-processing
-    )
-    
+    print('Creating SAM predictor...')
+    predictor = SamPredictor(sam)
+
     print('\nGenerating masks...')
     for cropped_image in tqdm(image_holder.get_images()):
         img = np.array(cropped_image.get_image())
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        cropped_image.set_mask(mask_generator.generate(img))
+        predictor.set_image(img)
+        x = int(cropped_image.get_X_center())
+        y = int(cropped_image.get_Y_center())
+        label = 1 #if cropped_image.get_type() == 'HII' else 2
+        input_point = np.array([[x,y]])
+        input_label = label
+
+        masks, scores, logits = predictor.predict(
+            point_coords=input_point,
+            point_labels=input_label,
+            multimask_output=True,
+        )
+        
+        cropped_image.set_mask(masks)
+        cropped_image.set_predict_scores(scores)
+        cropped_image.set_logits(logits)
+
+
+
     print('Mask generation complete!')
     print(image_holder)
 
