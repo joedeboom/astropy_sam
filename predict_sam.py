@@ -35,8 +35,8 @@ if __name__ == "__main__":
     scale_factor = 3
 
     # Define the reduced dataset.
-    # The dataset size will be reduced by the factor provided.
-    data_reduction = 200
+    # The dataset size will be reduced by the factor provided (data reduction = 1 is the full dataset)..
+    data_reduction = 1
     
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
