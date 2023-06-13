@@ -467,6 +467,9 @@ class CSV_Image(Cropped_Image):
         # {'': '0', 'Name': 'MCELS-L1', 'X_center': '13668.075', 'Y_center': '7012.1650', 'Radius': '12.500000'}
         self.csv_data = csv
         
+        # Define the scale factor for the image radius
+        self.scale_factor = scale_factor
+
         if scale_factor != 1:
             self.box = self.regenerate_boundary(image_shape, scale_factor)    
 
@@ -478,6 +481,8 @@ class CSV_Image(Cropped_Image):
         return float(self.csv_data['Y_center'])
     def get_radius(self):
         return float(self.csv_data['Radius'])
+    def get_scale_factor(self):
+        return self.scale_factor
     def __str__(self) -> str:
         s = '\n\nCSV file'
         s += '\nID: ' + str(self.id)
@@ -520,7 +525,10 @@ class CSV_Image(Cropped_Image):
             y2 = full_size
         b = {'p1':(int(x1),int(y1)), 'p2':(int(x2),int(y2))}
         return b
-
+    
+    # Define a function to return the center point of the cropped image
+    def get_image_center(self):
+        return int(self.get_radius() * self.scale_factor)
     # Define a function to generate and save plots to the corresponding file paths
     def generate_plot(self, path):    
         dest_name = path + self.type + '_' + self.get_name() + '_ID-' + str(self.get_id()) + '.png'

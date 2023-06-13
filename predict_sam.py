@@ -117,10 +117,12 @@ if __name__ == "__main__":
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         predictor.set_image(img)
-        x = int(cropped_image.get_X_center())
-        y = int(cropped_image.get_Y_center())
+        #x = int(cropped_image.get_X_center())
+        #y = int(cropped_image.get_Y_center())
+        # x and y need to be center of image
+        x = cropped_image.get_image_center()
         label = 1 #if cropped_image.get_type() == 'HII' else 2
-        input_point = np.array([[x,y]])
+        input_point = np.array([[x,x]])
         input_label = label
 
         masks, scores, logits = predictor.predict(
