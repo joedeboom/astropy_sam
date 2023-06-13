@@ -531,8 +531,8 @@ class CSV_Image(Cropped_Image):
         return int(self.get_radius() * self.scale_factor)
     # Define a function to generate and save plots to the corresponding file paths
     def generate_plot(self, path):    
-        dest_name = path + self.type + '_' + self.get_name() + '_ID-' + str(self.get_id()) + '.png'
-        if os.path.isfile(dest_name):
+        dest_name = path + self.type + '_' + self.get_name() + '_ID-' + str(self.get_id())
+        if os.path.isfile(dest_name + '.png'):
             return
         
         # Determine if it is automatic SAM
@@ -564,7 +564,7 @@ class CSV_Image(Cropped_Image):
             plt.title('Segmented')
     
             #plt.show()
-            plt.savefig(dest_name, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+            plt.savefig(dest_name + '.png', dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
     
             plt.close()
 
@@ -581,7 +581,7 @@ class CSV_Image(Cropped_Image):
                 plt.title(f"Mask {i+1}, Score: {score:.3f}", fontsize=18)
                 plt.axis('On')
                 #plt.show()
-                plt.savefig(dest_name + '_' + str(i), dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+                plt.savefig(dest_name + '_' + str(i) + '.png', dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
 
 
 
