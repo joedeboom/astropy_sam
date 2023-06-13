@@ -583,7 +583,7 @@ class CSV_Image(Cropped_Image):
                 #plt.show()
                 plt.savefig(dest_name + '_' + str(i) + '.png', dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
 
-
+                plt.close()
 
 
 
