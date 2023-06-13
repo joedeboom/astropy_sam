@@ -41,6 +41,9 @@ if __name__ == "__main__":
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
 
+    # Define if the program will run locally
+    local = False
+
     # Define data paths (for cloud)
     paths = {
         'HII_folder_path': './drive/MyDrive/Research/LMC/HII_boundaries',
@@ -53,14 +56,15 @@ if __name__ == "__main__":
 
 
     # Define data paths (for local  machine)
-    paths = {
-        'HII_folder_path': './LMC/HII_boundaries',
-        'SNR_folder_path': './LMC/SNR_boundaries',
-        'HII_csv_path': './old_model/csv/hii_regions.csv',
-        'SNR_csv_path': './old_model/csv/snrs.csv',
-        'image_path': './LMC/lmc_askap_aconf.fits',
-        'save_plots_folder_path': './cropped_imgs'
-    }
+    if local:
+        paths = {
+            'HII_folder_path': './LMC/HII_boundaries',
+            'SNR_folder_path': './LMC/SNR_boundaries',
+            'HII_csv_path': './old_model/csv/hii_regions.csv',
+            'SNR_csv_path': './old_model/csv/snrs.csv',
+            'image_path': './LMC/lmc_askap_aconf.fits',
+            'save_plots_folder_path': './cropped_imgs'
+        }
 
     
     print('Parameters:')
