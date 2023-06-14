@@ -238,16 +238,35 @@ class Image_Holder():
     # Define a function to generate and save the actual cropped image data (not just the boundaries) for each image in the holder.
     def generate_images(self):
         img_data = fits.getdata(self.image_path)[0][0]
-        img_data[np.isnan(img_data)] = -1
+        #img_data[np.isnan(img_data)] = -1
         #img_data = fits.getdata(self.image_path)
+        
+        # Load the FITS image using astropy.io.fits
+        #fits_image = fits.open(self.image_path)
+        #img_data = fits_image[0].data        
+        
         for image in self.images:
             curr_box = image.get_box()
             x1,y1 = curr_box['p1']
             x2,y2 = curr_box['p2']
-            image.set_image(img_data[y1:y2,x1:x2])
-            #if image.get_id() % 50 == 0:
-                #print('raw image data for #' + str(image.get_id()))
-                #print(img_data[y1:y2,x1:x2])
+            img = np.array(img_data[y1:y2,x1:x2])
+            #img = img.astype(np.uint8)
+            #img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)  # Convert to BGR if necessary
+            #img = cv2.convertScaleAbs(img)  # Convert to 8-bit format if necessary
+
+            # Normalize the image data (optional)
+            normalized_data = (img - img.min()) / (img.max() - img.min())
+
+            # Convert the image to RGB
+            rgb_image = cv2.cvtColor(normalized_data, cv2.COLOR_GRAY2RGB)
+            
+            # Convert the image to uint8
+            rgb_image_uint8 = (rgb_image * 255).astype(np.uint8)
+
+            image.set_image(rgb_image_uint8)
+
+    # Define a function to generate the corresponding annotation image from the region file
+    #def generate_image_annotations(self):
 
 
     # Define a function to clear the image data for all images (for saving)
@@ -547,7 +566,7 @@ class CSV_Image(Cropped_Image):
             plt.title('Source')
 
             plt.subplot(1,2,2)
-            #plt.imshow(self.image)
+            plt.imshow(self.image)
             sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
         
             #plt.set_autoscale_on(False)

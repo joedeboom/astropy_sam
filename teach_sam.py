@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data_reduction = 1 is the full data set).
-    data_reduction = 1
+    data_reduction = 10
     
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
@@ -109,22 +109,25 @@ if __name__ == "__main__":
     print('Sending SAM to ' + device)
     sam.to(device=device)
     print('Creating automatic mask generator...')
-    mask_generator = SamAutomaticMaskGenerator(
-        model=sam,
-        points_per_side=32,
-        pred_iou_thresh=0.8,
-        stability_score_thresh=0.8,
-        crop_n_layers=0,
-        crop_n_points_downscale_factor=2,
+    mask_generator = SamAutomaticMaskGenerator(sam)
+        #model=sam,
+        #points_per_side=32,
+        #pred_iou_thresh=0.9,
+        #stability_score_thresh=0.85,
+        #crop_n_layers=0,
+        #crop_n_points_downscale_factor=2,
         #min_mask_region_area=100,  # Requires open-cv to run post-processing
-    )
+    #)
     
     print('\nGenerating masks...')
     for cropped_image in tqdm(image_holder.get_images()):
-        img = np.array(cropped_image.get_image())
-        img = img.astype(np.uint8)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cropped_image.get_image()
+        #img = img.astype(np.uint8)
+        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)  # Convert to BGR if necessary
+        #img = cv2.convertScaleAbs(img)  # Convert to 8-bit format if necessary
         cropped_image.set_mask(mask_generator.generate(img))
+    
     print('Mask generation complete!')
     print(image_holder)
 

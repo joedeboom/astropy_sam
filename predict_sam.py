@@ -36,13 +36,13 @@ if __name__ == "__main__":
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data reduction = 1 is the full dataset)..
-    data_reduction = 1
+    data_reduction = 200
     
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
 
     # Define if the program will run locally
-    local = False
+    local = True
 
     # Define data paths (for cloud)
     paths = {
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     predictor = SamPredictor(sam)
 
     print('\nGenerating masks...')
-    for cropped_image in tqdm(image_holder.get_images()):
+    for cropped_image in tqdm(image_holder.get_images().reverse()):
         img = np.array(cropped_image.get_image())
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -135,6 +135,7 @@ if __name__ == "__main__":
         cropped_image.set_predict_scores(scores)
         cropped_image.set_logits(logits)
 
+        predictor = SamPredictor(sam)
 
 
     print('Mask generation complete!')
