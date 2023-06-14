@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data_reduction = 1 is the full data set).
-    data_reduction = 10
+    data_reduction = 1
     
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
