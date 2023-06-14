@@ -597,7 +597,9 @@ class CSV_Image(Cropped_Image):
                 input_point = np.array([[x,x]])
                 input_label = np.array([1])
                 show_points(input_point, input_label, plt.gca())
-                plt.title(f"Mask {i+1}, Score: {score:.3f}", fontsize=18)
+                chart_title = self.get_name() + '  ' + self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Score: '     + str(round(score, 3))
+                #plt.title(f"Mask {i+1}, Score: {score:.3f}", fontsize=18)
+                plt.title(chart_title)
                 plt.axis('On')
                 #plt.show()
                 sname = dest_name + '_' + str(i) + '.png'
