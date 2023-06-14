@@ -36,13 +36,13 @@ if __name__ == "__main__":
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data reduction = 1 is the full dataset)..
-    data_reduction = 200
+    data_reduction = 10
     
     # Define the image holder save name
     imageholder_save = 'imgholder_save'
 
     # Define if the program will run locally
-    local = True
+    local = False
 
     # Define data paths (for cloud)
     paths = {
