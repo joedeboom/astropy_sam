@@ -109,15 +109,15 @@ if __name__ == "__main__":
     print('Sending SAM to ' + device)
     sam.to(device=device)
     print('Creating automatic mask generator...')
-    mask_generator = SamAutomaticMaskGenerator(sam)
-        #model=sam,
-        #points_per_side=32,
-        #pred_iou_thresh=0.9,
-        #stability_score_thresh=0.85,
-        #crop_n_layers=0,
-        #crop_n_points_downscale_factor=2,
+    mask_generator = SamAutomaticMaskGenerator(#sam)
+        model=sam,
+        points_per_side=32,
+        pred_iou_thresh=0.9,
+        stability_score_thresh=0.85,
+        crop_n_layers=0,
+        crop_n_points_downscale_factor=2,
         #min_mask_region_area=100,  # Requires open-cv to run post-processing
-    #)
+    )
     
     print('\nGenerating masks...')
     for cropped_image in tqdm(image_holder.get_images()):
