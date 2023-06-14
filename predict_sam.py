@@ -112,7 +112,7 @@ if __name__ == "__main__":
     predictor = SamPredictor(sam)
 
     print('\nGenerating masks...')
-    for cropped_image in tqdm(image_holder.get_images().reverse()):
+    for cropped_image in tqdm(image_holder.get_images()):
         img = np.array(cropped_image.get_image())
         img = img.astype(np.uint8)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
