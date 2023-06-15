@@ -530,6 +530,7 @@ class CSV_Image(Cropped_Image):
         #
         x, y = self.center
         radius = self.get_radius() * scale_factor
+        radius = min(radius, 800)
         x1 = x - radius
         if x1 < 0:
             x1 = 0
