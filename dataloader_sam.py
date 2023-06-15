@@ -385,6 +385,11 @@ class Cropped_Image():
             return self.image
     def get_mask(self):
         return self.mask
+    def get_mask_count(self):
+        if self.mask is None:
+            return 0
+        else:
+            return len(self.mask)
     def print_mask(self):
         if self.mask is None:
             return 'Not generated yet.'
@@ -512,7 +517,7 @@ class CSV_Image(Cropped_Image):
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
         s += '\nImage: ' + str(self.print_image())
-        s += '\nMask count: ' + str(len(self.print_mask()))
+        s += '\nMask count: ' + str(self.get_mask_count())
         s += '\nMask: ' + str(self.print_mask())
         return s
 
