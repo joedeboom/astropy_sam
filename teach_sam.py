@@ -46,11 +46,11 @@ if __name__ == "__main__":
 
     # Define data paths (for cloud)
     paths = {
-        'HII_folder_path': './drive/MyDrive/Research/LMC/HII_boundaries',
-        'SNR_folder_path': './drive/MyDrive/Research/LMC/SNR_boundaries',
+        'HII_folder_path': './drive/MyDrive/Astropy/LMC/HII_boundaries',
+        'SNR_folder_path': './drive/MyDrive/Astropy/LMC/SNR_boundaries',
         'HII_csv_path': './astropy_sam/old_model/csv/hii_regions.csv',
         'SNR_csv_path': './astropy_sam/old_model/csv/snrs.csv',
-        'image_path': './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits',
+        'image_path': './drive/MyDrive/Astropy/LMC/lmc_askap_aconf.fits',
         'save_plots_folder_path': './astropy_sam/cropped_imgs'
     }
 
