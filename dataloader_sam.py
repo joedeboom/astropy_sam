@@ -14,6 +14,8 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pprint
+from PIL import Image
+from matplotlib.backends.backend_pdf import PdfPages
 
 # define a function to check if the provided region file uses an image coordinate system
 # Used in the Image_Holder initialization to help remove the invalid coordinate region files
@@ -239,22 +241,14 @@ class Image_Holder():
     def generate_images(self):
         img_data = fits.getdata(self.image_path)[0][0]
         #img_data[np.isnan(img_data)] = -1
-        #img_data = fits.getdata(self.image_path)
-        
-        # Load the FITS image using astropy.io.fits
-        #fits_image = fits.open(self.image_path)
-        #img_data = fits_image[0].data        
         
         for image in self.images:
             curr_box = image.get_box()
             x1,y1 = curr_box['p1']
             x2,y2 = curr_box['p2']
             img = np.array(img_data[y1:y2,x1:x2])
-            #img = img.astype(np.uint8)
-            #img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)  # Convert to BGR if necessary
-            #img = cv2.convertScaleAbs(img)  # Convert to 8-bit format if necessary
 
-            # Normalize the image data (optional)
+            # Normalize the image data
             normalized_data = (img - img.min()) / (img.max() - img.min())
 
             # Convert the image to RGB
@@ -264,6 +258,7 @@ class Image_Holder():
             rgb_image_uint8 = (rgb_image * 255).astype(np.uint8)
 
             image.set_image(rgb_image_uint8)
+
 
     # Define a function to generate the corresponding annotation image from the region file
     #def generate_image_annotations(self):
@@ -305,7 +300,7 @@ class Image_Holder():
         f = open(path, 'w')
         s = 'Files with multiple masks:\n'
         for image in multi_mask_images:
-            s += 'ID-' + str(image.get_id()) + '\n'
+            s += 'ID-' + str(image.get_id()) + '\tMask count: ' + str(image.get_mask_count()) + '\n'
         s += '\n\n'
         s += self.print_stats()
         for image in self.images:
@@ -316,24 +311,28 @@ class Image_Holder():
 
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
-    def save_plots(self, path):
+    def save_plots(self, path, save_img):
         full_path = path + '/' + self.mode + '_scale-' + str(self.scale_factor).replace('.','-') + '_maskcount-' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         multi_mask_images = []
-        for  image in tqdm(self.images):
-            image.generate_plot(full_path)
+        #file_names = []
+        #for image in tqdm(self.images):
+        #    file_names.extend(image.generate_plot(full_path))
+        #    if len(image.get_mask()) > 1:
+        #        multi_mask_images.append(image)
+
+        #self.write_stats(full_path + 'stats.txt', multi_mask_images)
+        
+        # Create pdf
+        pdf = PdfPages(full_path + 'results.pdf')
+        for image in tqdm(self.images):
+            image.generate_plot(full_path, save_img, pdf)
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
+        pdf.close()
 
         self.write_stats(full_path + 'stats.txt', multi_mask_images)
-
-
-
-
-
-
-
 
 # Define classes.
 # Parent class: Cropped_Image
@@ -555,10 +554,8 @@ class CSV_Image(Cropped_Image):
     def get_image_center(self):
         return int(self.get_radius() * self.scale_factor)
     # Define a function to generate and save plots to the corresponding file paths
-    def generate_plot(self, path):    
+    def generate_plot(self, path, save_img, pdf):    
         dest_name = path + self.type + '_' + self.get_name() + '_ID-' + str(self.get_id())
-        #if os.path.isfile(dest_name + '.png'):
-        #    return
         
         # Determine if it is automatic SAM
         if self.predict_scores is None:
@@ -589,10 +586,12 @@ class CSV_Image(Cropped_Image):
             plt.title('Segmented')
     
             #plt.show()
-            plt.savefig(dest_name + '.png', dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
-    
+            sname = dest_name + '.png'
+            if save_img:
+                plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+            pdf.savefig()
             plt.close()
-
+            
         else:
             # Is Predictor SAM
             for i, (mask, score) in enumerate(zip(self.mask, self.predict_scores)):
@@ -609,13 +608,12 @@ class CSV_Image(Cropped_Image):
                 plt.axis('On')
                 #plt.show()
                 sname = dest_name + '_' + str(i) + '.png'
-                print('Saving ' + sname)
-                plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
-
+                if save_img:
+                    plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+                pdf.savefig()
                 plt.close()
 
-
-
+        
 
 
 

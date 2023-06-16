@@ -27,6 +27,9 @@ if __name__ == "__main__":
     # Local
     save_plots_folder_path = './cropped_imgs'
 
+    # Define bool to save individual pngs
+    save_img = False
+
     # Obtain the image holder
     save_file_path = './imgholder_save'
     print('Loading the image holder from ' + save_file_path + '...',end='\t')
@@ -38,6 +41,6 @@ if __name__ == "__main__":
     
     # Save the plots to folder
     print('Generating plots and saving to ' + save_plots_folder_path + '...')
-    image_holder.save_plots(save_plots_folder_path)
+    image_holder.save_plots(save_plots_folder_path, save_img)
 
 
