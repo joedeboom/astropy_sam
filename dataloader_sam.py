@@ -192,7 +192,7 @@ class Image_Holder():
 
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
-    # This function loads computes the centers of each image via the region files.
+    # This function computes the centers of each image via the region files.
     def finish_init_region(self) -> list:
         imgs = []
         for file in self.HII_reg_files:
@@ -316,13 +316,6 @@ class Image_Holder():
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         multi_mask_images = []
-        #file_names = []
-        #for image in tqdm(self.images):
-        #    file_names.extend(image.generate_plot(full_path))
-        #    if len(image.get_mask()) > 1:
-        #        multi_mask_images.append(image)
-
-        #self.write_stats(full_path + 'stats.txt', multi_mask_images)
         
         # Create pdf
         pdf = PdfPages(full_path + 'results.pdf')
@@ -331,12 +324,19 @@ class Image_Holder():
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
         pdf.close()
-
+        print('Saved ' + full_path + 'results.pdf to file.')
         self.write_stats(full_path + 'stats.txt', multi_mask_images)
 
-# Define classes.
+
+
+
+
+
+
+
+# Define image classes.
 # Parent class: Cropped_Image
-# Child classes: Region_Image, CSV_Image, tic tac toe image
+# Child classes: Region_Image, CSV_Image, grid image
 
 
 # Define a Cropped_Image parent class.
