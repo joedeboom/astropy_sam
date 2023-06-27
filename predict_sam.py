@@ -22,7 +22,7 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 if __name__ == "__main__":
 
     # Define the mode. Determine to construct the images from region files, csv files or grid
-    mode = 'csv'
+    mode = 'region'
 
     # Define cropped image size
     size = 180
@@ -32,17 +32,17 @@ if __name__ == "__main__":
 
     # Define the radius scale factor.
     # If scale factor == 1, the default image size (defined above) will be used.
-    scale_factor = 3
+    scale_factor = 2
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data reduction = 1 is the full dataset)..
-    data_reduction = 10
+    data_reduction = 100
     
     # Define the image holder save name
-    imageholder_save = 'imgholder_save'
+    imageholder_save = 'imgholder_save.pkl'
 
     # Define if the program will run locally
-    local = False
+    local = True
 
     # Define data paths (for cloud)
     paths = {
@@ -90,16 +90,20 @@ if __name__ == "__main__":
     print('Generating the cropped images...')
     image_holder.generate_images()
 
+    # If csv, attach the polygon annotations to images
+    if mode == 'csv':
+        print('Attaching polygons to images...')
+        image_holder.attach_region_to_csv()
+
 
     # Experiment with fits
-    hdul = fits.open(paths['image_path'])
-    hdul.info()
-
-    hdul.close()
+    #hdul = fits.open(paths['image_path'])
+    #hdul.info()
+    #hdul.close()
 
     print(image_holder)
 
-
+    
     # SAM ------------------------------------------------------------------------------------------------------
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -121,14 +125,18 @@ if __name__ == "__main__":
         #y = int(cropped_image.get_Y_center())
         # x and y need to be center of image
         x = cropped_image.get_image_center()
-        label = 1 #if cropped_image.get_type() == 'HII' else 2
+        if cropped_image.get_type() == 'HII':
+            label = 1
+        else:
+            label = 2
         input_point = np.array([[x,x]])
         input_label = np.array([label])
 
         masks, scores, logits = predictor.predict(
-            point_coords=input_point,
-            point_labels=input_label,
-            multimask_output=True,
+            point_coords=None,#input_point,
+            point_labels=None,#input_label,
+            box=cropped_image.get_region_box_for_SAM(),
+            multimask_output=True,#True,
         )
         
         cropped_image.set_mask(masks)
@@ -140,7 +148,7 @@ if __name__ == "__main__":
 
     print('Mask generation complete!')
     print(image_holder)
-
+    
     
     print('Saving the image holder with the updated masks to ' + imageholder_save)
     with open(imageholder_save, 'wb') as f:

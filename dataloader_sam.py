@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import cv2
 import os
+import math
 import glob
 import pickle
 from regions import Regions
@@ -63,6 +64,47 @@ def show_anns(anns):
     ax.imshow(img)
 
 
+# Define a function to check if a point is inside a polygon
+def point_in_polygon(x, y, poly):
+    n = len(poly)
+    inside = False
+
+    p1x, p1y = poly[0]
+    for i in range(1, n + 1):
+        p2x, p2y = poly[i % n]
+        if y > min(p1y, p2y):
+            if y <= max(p1y, p2y):
+                if x <= max(p1x, p2x):
+                    if p1y != p2y:
+                        xints = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                    if p1x == p2x or x <= xints:
+                        inside = not inside
+        p1x, p1y = p2x, p2y
+
+    return inside
+
+
+# Define a function to get the center of a region
+# This function reads a region file, extracts the x and y coordinates of the vertices,
+# then calculates and returns the center coordinates
+def get_center(poly):
+    left = float('inf')
+    right = float('-inf')
+    bot = float('inf')
+    top = float('-inf')
+
+    for point in poly:
+        x, y = point
+        if x > right:
+            right = x
+        if x < left:
+            left = x
+        if y < bot:
+            bot = y
+        if y > top:
+            top = y
+    return ((left + right) // 2, (top + bot) // 2)
+
 
 
 
@@ -109,7 +151,7 @@ class Image_Holder():
 
         # Define the list to hold the cropped image objects
         if mode == 'region':
-            self.images = self.finish_init_region()
+            self.images = self.finish_init_region2()
         elif mode == 'csv':
             self.images = self.finish_init_csv()
         elif mode == 'grid':
@@ -190,6 +232,24 @@ class Image_Holder():
                 count += 1
         return imgs
 
+    # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
+    # This function computes the centers of each image via the region files.
+    # This is attempt 2
+    def finish_init_region2(self) -> list:
+        imgs = []
+        count = self.data_reduction
+        for file in self.HII_reg_files:
+            if count % self.data_reduction == 0:
+                region = Regions.read(file, format='ds9')
+                imgs.append(Region_Image(region, 'HII', self.image_size_crop, self.image_size_full, self.scale_factor))
+            count += 1
+        count = self.data_reduction
+        for file in self.SNR_reg_files:
+            if count % self.data_reduction == 0:
+                region = Regions.read(file, format='ds9')
+                imgs.append(Region_Image(region, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor))
+            count += 1
+        return imgs
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function computes the centers of each image via the region files.
@@ -248,21 +308,93 @@ class Image_Holder():
             x2,y2 = curr_box['p2']
             img = np.array(img_data[y1:y2,x1:x2])
 
+            """ OLD WAY
+
             # Normalize the image data
             normalized_data = (img - img.min()) / (img.max() - img.min())
 
             # Convert the image to RGB
             rgb_image = cv2.cvtColor(normalized_data, cv2.COLOR_GRAY2RGB)
-            
+
             # Convert the image to uint8
             rgb_image_uint8 = (rgb_image * 255).astype(np.uint8)
 
             image.set_image(rgb_image_uint8)
+            """
+
+            """ NEW WAY """
+            
+            # Normalize the image data
+            normalized_data = (img - img.min()) / (img.max() - img.min())
+
+            # Apply histogram equalization to enhance brightness
+            equalized_data = cv2.equalizeHist((normalized_data * 255).astype(np.uint8)) / 255
+
+            # Define brightness factor
+            brightness_factor = 1
+
+            # Adjust the brightness by multiplying with the factor
+            brightness_adjusted = equalized_data * brightness_factor
+
+            # Clip the pixel values to the valid range of [0, 1]
+            brightness_adjusted = np.clip(brightness_adjusted, 0, 1)
+
+            # Convert the adjusted grayscale image to RGB
+            rgb_image = cv2.cvtColor((brightness_adjusted * 255).astype(np.uint8), cv2.COLOR_GRAY2RGB)
+
+            # Convert the image to RGB
+            #rgb_image = cv2.cvtColor(brightness_adjusted, cv2.COLOR_GRAY2RGB)
+
+            # Convert the image to uint8
+            #rgb_image_uint8 = (rgb_image * 255).astype(np.uint8)
+
+            # Set the image
+            image.set_image(rgb_image)
 
 
     # Define a function to generate the corresponding annotation image from the region file
     #def generate_image_annotations(self):
 
+    # Define a function to attach region annotations to the correct csv cropped image
+    def attach_region_to_csv(self):
+        reg_files = self.HII_reg_files.copy()
+        reg_files.extend(self.SNR_reg_files.copy())
+        for file in reg_files:
+            regions = Regions.read(file, format='ds9')
+            Xs = regions[0].vertices.x
+            Ys = regions[0].vertices.y
+            poly = list(zip(Xs, Ys))
+
+            # Attempt to match each image center to a polygon
+            for image in self.images:
+                x = image.get_X_center()
+                y = image.get_Y_center()
+                if point_in_polygon(x,y,poly):
+                    # Image center is inside of the current polygon
+                    if image.get_polygon() is None:
+                        # Image has not had a polygon assigned to it yet
+                        print('Attaching ' + file + ' to ' + image.get_name())      
+                        # Set the polygon to image
+                        image.set_polygon(poly)
+                    else:
+                        # Image already has a polygon. Check if this new polygon is a better fit.
+                        q = [x,y]
+                        curr_poly_cent = get_center(image.get_polygon())
+                        p = [curr_poly_cent[0], curr_poly_cent[1]]
+                        curr_dist = math.dist(p,q)
+                        proposed_poly_cent = get_center(poly)
+                        p = [proposed_poly_cent[0], proposed_poly_cent[1]]
+                        proposed_dist = math.dist(p,q)
+                        if proposed_dist < curr_dist:
+                            # The proposed polygon is a better fit. Update the object with new polygon
+                            print('Updating ' + file + ' to ' + image.get_name())
+                            image.set_polygon(poly)
+
+        print('Images with no polygons: ')
+        for image in self.images:
+            if image.get_polygon() is None:
+                print(image.get_name())
+        print()
 
     # Define a function to clear the image data for all images (for saving)
     def clear_images(self):
@@ -342,7 +474,7 @@ class Image_Holder():
 # Define a Cropped_Image parent class.
 class Cropped_Image():
     index = 0
-    def __init__(self, cen, file_type, crop_size, image_shape) -> None:
+    def __init__(self, cen, file_type, crop_size, image_shape, polygon=None) -> None:
         # Define the center of the cropped image
         self.center = cen
 
@@ -367,6 +499,9 @@ class Cropped_Image():
         self.predict_scores = None
         self.logits = None
 
+        # Define the polygon annotation for the image
+        self.polygon = polygon
+    
     def get_center(self):
         return self.center
     def get_box(self):
@@ -398,6 +533,15 @@ class Cropped_Image():
         return self.predict_scores
     def get_logits(self):
         return self.logits
+    def get_polygon(self):
+        return self.polygon
+    def set_polygon(self, poly):
+        self.polygon = poly
+    def print_poly(self):
+        if self.polygon is None:
+            return 'Not generated yet.'
+        else:
+            return pprint.pformat(self.polygon)
     def __str__(self) -> str:
         s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image)) + '\nMask: \n' + str(self.mask)
         return s
@@ -464,19 +608,214 @@ class Grid_Image(Cropped_Image):
 
 # Create a Region_Image child class.
 class Region_Image(Cropped_Image):
-    def __init__(self, cen, file_type, crop_size, image_shape) -> None:
-        super().__init__(cen, file_type, crop_size, image_shape)
+    def __init__(self, region, file_type, crop_size, image_shape, scale_factor) -> None:
+        # Define region parameters
+        self.region = region
+        self.Xs = region[0].vertices.x
+        self.Ys = region[0].vertices.y
+        poly = list(zip(self.Xs, self.Ys))
+        cen = get_center(poly)
+
+        # Init super
+        super().__init__(cen, file_type, crop_size, image_shape, polygon=poly)
+        
+        # Define the region box. This is the box the tightly bounds the region, not the boundary of the cropped image.
+        self.region_box = self.get_region_box()
+
+        # Define the scale factor for the image radius
+        self.scale_factor = scale_factor
+
+        # Regenerate boundary if necessary
+        # For region images, the box is the region box by default (instead of the cropped image size parameter)
+        if scale_factor == 1:
+            self.box = self.region_box
+        else:
+            self.box = self.regenerate_boundary(image_shape, scale_factor)
+        
+        # Define the transformed polygon onto the cropped image
+        self.transformed_polygon = self.get_polygon_transformation()
+
+        # Define the transformed region box onto the cropped image
+        self.transformed_region_box = self.get_transformed_region_box()
+        # Define the background SAM input points to assist segmentation
+        #self.background_points = self.get_background_points()
+    
+    # Define a function to return the bounding box of the region in an optimal form to pass into SAM
+    def get_region_box_for_SAM(self):
+        x1,y1 = self.transformed_region_box['p1']
+        x2,y2 = self.transformed_region_box['p2']
+        return np.array([x1,y1,x2,y2])
+
+    def get_image_center(self):
+        return int(self.get_radius() * self.scale_factor)
     def __str__(self) -> str:
         s = '\n\nRegion file.'
         s += '\nID: ' + str(self.id)
         s += '\nType: ' + self.type
         s += '\nCenter: ' + str(self.center)
+        s += '\nTransformed center: ' + str(self.get_image_center())
+        s += '\nRadius: ' +  str(self.get_radius())
         s += '\nBox: ' + str(self.box)
+        s += '\nRegion box: ' + str(self.region_box)
+        s += '\nTransformed region box: ' + str(self.transformed_region_box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
         s += '\nImage: ' + str(self.print_image())
+        s += '\nPolygon: ' + str(self.print_poly())
+        s += '\nTransformed polygon: ' + str(pprint.pformat(self.transformed_polygon))
+        s += '\nMask count: ' + str(self.get_mask_count())
         s += '\nMask: ' + str(self.print_mask())
         return s
+    def get_radius(self):
+        x,y = self.center
+        x1,y1 = self.region_box['p1']
+        return max(x-x1,y-y1)
 
+    # Define a function to compute the polygon linear transformation
+    # Returns the new polygon that can be overlayed onto the cropped image
+    def get_polygon_transformation(self):
+        transformed_poly = []
+        x_poly_cen, y_poly_cen = self.center
+        x_transform = x_poly_cen - self.get_image_center()
+        y_transform = y_poly_cen - self.get_image_center()
+        for point in self.polygon:
+            xp,yp = point
+            x_new = xp - x_transform
+            y_new = yp - y_transform
+            new_point = (x_new, y_new)
+            transformed_poly.append(new_point)
+        return transformed_poly
+
+    # Define a function to compute the linear transformation of the region box
+    def get_transformed_region_box(self):
+        x_poly_cen, y_poly_cen = self.center
+        x_transform = x_poly_cen - self.get_image_center()
+        y_transform = y_poly_cen - self.get_image_center()
+        x1, y1 = self.region_box['p1']
+        x2, y2 = self.region_box['p2']
+        b = {'p1':(int(x1-x_transform),int(y1-y_transform)), 'p2':(int(x2-x_transform),int(y2-y_transform))}
+        return b
+
+    def get_region_box(self):
+        # Define a function to generate the bounding box of the region.
+        left = float('inf')
+        right = float('-inf')
+        bot = float('inf')
+        top = float('-inf')
+
+        for point in self.polygon:
+            x, y = point
+            if x > right:
+                right = x
+            if x < left:
+                left = x
+            if y < bot:
+                bot = y
+            if y > top:
+                top = y
+
+        b = {'p1':(int(left),int(bot)), 'p2':(int(right),int(top))}
+        return b
+        
+    def regenerate_boundary(self, full_size, scale_factor) -> None:
+        # Define a function to regenerate the cropped boundary proportional to the scale factor and the radius of the region.
+        # Input: the center coordinates of the region to be cropped
+        # Returns: the boxed region
+        #
+        # x1,y1-----------*
+        #  |              |
+        #  |              |
+        #  |              |
+        #  |              |
+        #  *------------x2,y2
+        #
+        x, y = self.center
+        radius = self.get_radius() * scale_factor
+        radius = min(radius, 800)
+        x1 = x - radius
+        if x1 < 0:
+            x1 = 0
+        y1 = y - radius
+        if y1 < 0:
+            y1 = 0
+        x2 = x + radius
+        if x2 > full_size:
+            x2 = full_size
+        y2 = y + radius
+        if y2 > full_size:
+            y2 = full_size
+        b = {'p1':(int(x1),int(y1)), 'p2':(int(x2),int(y2))}
+        return b
+
+    # Define a function to generate and save plots to the corresponding file paths
+    def generate_plot(self, path, save_img, pdf):    
+        dest_name = path + self.type + '_ID-' + str(self.get_id())
+        
+        # Determine if it is automatic SAM
+        if self.predict_scores is None:
+            plt.subplots(figsize=(14,7))
+            chart_title = self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Mask Count: ' + str(len(self.mask))
+            plt.suptitle(chart_title)
+
+            plt.subplot(1,2,1)
+            plt.imshow(self.image.copy())
+            plt.axis('On')
+            plt.title('Source')
+
+            plt.subplot(1,2,2)
+            plt.imshow(self.image)
+            sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
+        
+            #plt.set_autoscale_on(False)
+
+            img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
+            img[:,:,3] = 0
+            for ann in sorted_anns:
+                m = ann['segmentation']
+                color_mask = np.concatenate([np.random.random(3), [0.35]])
+                img[m] = color_mask
+            plt.imshow(img)
+
+            plt.axis('On')
+            plt.title('Segmented')
+    
+            #plt.show()
+            sname = dest_name + '.png'
+            if save_img:
+                plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+            pdf.savefig()
+            plt.close()
+            
+        else:
+            # Is Predictor SAM
+            for i, (mask, score) in enumerate(zip(self.mask, self.predict_scores)):
+                plt.subplots(figsize=(14,7))
+                chart_title = self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Score: '     + str(round(score, 3))
+                plt.suptitle(chart_title)
+
+                plt.subplot(1,2,1)
+                plt.imshow(self.image.copy())
+                plt.scatter(*zip(*self.transformed_polygon))
+                plt.axis('On')
+                plt.title('Source annotation')
+
+                plt.subplot(1,2,2)
+                plt.imshow(self.image)
+                show_mask(mask, plt.gca())
+                x = self.get_image_center()
+                input_point = np.array([[x,x]])
+                input_label = np.array([1])
+                #show_points(input_point, input_label, plt.gca())
+                show_box(self.get_region_box_for_SAM(), plt.gca())
+                plt.title('Segmentation ' + str(i))
+                plt.axis('On')
+                #plt.show()
+                sname = dest_name + '_' + str(i) + '.png'
+                if save_img:
+                    plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
+                pdf.savefig()
+                plt.close()
+
+        
 
 
 
@@ -516,12 +855,13 @@ class CSV_Image(Cropped_Image):
         s += '\nBox: ' + str(self.box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
         s += '\nImage: ' + str(self.print_image())
+        s += '\nPolygon: ' + str(self.print_poly())
         s += '\nMask count: ' + str(self.get_mask_count())
         s += '\nMask: ' + str(self.print_mask())
         return s
 
     def regenerate_boundary(self, full_size, scale_factor) -> None:
-        # Define a function to generate the cropped images to pass into the model.
+        # Define a function to regenerate the cropped boundary proportional to the scale factor and the radius of the region.
         # Input: the center coordinates of the region to be cropped
         # Returns: the boxed region
         #

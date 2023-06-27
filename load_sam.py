@@ -22,6 +22,7 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 # Define main function
 if __name__ == "__main__":
     
+    # Drive
     save_plots_folder_path = './astropy_sam/cropped_imgs'
     
     # Local
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     save_img = False
 
     # Obtain the image holder
-    save_file_path = './imgholder_save'
+    save_file_path = './imgholder_save.pkl'
     print('Loading the image holder from ' + save_file_path + '...',end='\t')
     image_holder = pickle.load(open(save_file_path, 'rb'))
     if image_holder is not None:
