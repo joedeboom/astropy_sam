@@ -22,11 +22,15 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 # Define main function
 if __name__ == "__main__":
     
+    # Define if program will run locally
+    local = False
+
     # Drive
     save_plots_folder_path = './astropy_sam/cropped_imgs'
     
     # Local
-    save_plots_folder_path = './cropped_imgs'
+    if local:
+        save_plots_folder_path = './cropped_imgs'
 
     # Define bool to save individual pngs
     save_img = False
