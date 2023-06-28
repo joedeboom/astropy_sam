@@ -33,10 +33,19 @@ if __name__ == "__main__":
     # Define the radius scale factor.
     # If scale factor == 1, the default image size (defined above) will be used.
     scale_factor = 2
+    
+    # Define the image normalization technique. og or hist
+    normalization = 'og'
+    
+    # Define the brightness factors to be applied to the images
+    brightness_factors = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data reduction = 1 is the full dataset)..
     data_reduction = 100
+
+    # Define if SAM will use points, boxes, or both
+    SAM_mode = 'box'
     
     # Define the image holder save name
     imageholder_save = 'imgholder_save.pkl'
@@ -51,7 +60,7 @@ if __name__ == "__main__":
         'HII_csv_path': './astropy_sam/old_model/csv/hii_regions.csv',
         'SNR_csv_path': './astropy_sam/old_model/csv/snrs.csv',
         'image_path': './drive/MyDrive/Research/LMC/lmc_askap_aconf.fits',
-        'save_plots_folder_path': './astropy_sam/cropped_imgs'
+        'save_plots_folder_path': './astropy_sam'
     }
 
 
@@ -63,7 +72,7 @@ if __name__ == "__main__":
             'HII_csv_path': './old_model/csv/hii_regions.csv',
             'SNR_csv_path': './old_model/csv/snrs.csv',
             'image_path': './LMC/lmc_askap_aconf.fits',
-            'save_plots_folder_path': './cropped_imgs'
+            'save_plots_folder_path': '.'
         }
 
     
@@ -73,6 +82,8 @@ if __name__ == "__main__":
     print('Image shape: ' + str(image_shape))
     print('Scale factor: ' + str(scale_factor))
     print('Data reduction: ' + str(data_reduction))
+    print('Normalization: ' +  normalization)
+    print('SAM mode: ' + SAM_mode)
     print()
 
     # Check the save plot folder path. Remaining paths are checked in image holder constructor.
@@ -84,7 +95,7 @@ if __name__ == "__main__":
 
     # Obtain the image holder
     print('Obtaining the image holder...')
-    image_holder = Image_Holder(size, image_shape, paths, mode, scale_factor, data_reduction)
+    image_holder = Image_Holder(size, image_shape, paths, mode, scale_factor, data_reduction, normalization, SAM_mode, brightness_factors)
 
     # Generate the images in the image holder
     print('Generating the cropped images...')
@@ -108,7 +119,7 @@ if __name__ == "__main__":
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model_type = 'default'
-    print('\nCheckpoint: ' + sam_checkpoint + '\nDevice: ' + device + '\nModel type: ' + model_type + '\n\nCreating SAM...')
+    print('\nCheckpoint: ' + sam_checkpoint + '\nDevice: ' + device + '\nModel type: ' + model_type + '\nSAM mode: ' + SAM_mode + '\n\nCreating SAM...')
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     print('Sending SAM to ' + device)
     sam.to(device=device)
@@ -131,13 +142,27 @@ if __name__ == "__main__":
             label = 2
         input_point = np.array([[x,x]])
         input_label = np.array([label])
-
-        masks, scores, logits = predictor.predict(
-            point_coords=None,#input_point,
-            point_labels=None,#input_label,
-            box=cropped_image.get_region_box_for_SAM(),
-            multimask_output=True,#True,
-        )
+        
+        if SAM_mode == 'box':
+            masks, scores, logits = predictor.predict(
+                point_coords=None,
+                point_labels=None,
+                box=cropped_image.get_region_box_for_SAM(),
+                multimask_output=True,
+            )
+        elif SAM_mode == 'point':
+            masks, scores, logits = predictor.predict(
+                point_coords=input_point,
+                point_labels=input_label,
+                multimask_output=True,
+            )
+        else:
+            masks, scores, logits = predictor.predict(
+                point_coords=input_point,
+                point_labels=input_label,
+                box=cropped_image.get_region_box_for_SAM(),
+                multimask_output=True,
+            )
         
         cropped_image.set_mask(masks)
         cropped_image.set_predict_scores(scores)

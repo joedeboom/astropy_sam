@@ -8,6 +8,8 @@ import numpy as np
 import cv2
 import os
 import math
+import copy
+import time
 import glob
 import pickle
 from regions import Regions
@@ -110,7 +112,7 @@ def get_center(poly):
 
 # Define an image holder class
 class Image_Holder():
-    def __init__(self, size, image_shape, paths, mode, scale_factor, data_reduction) -> None:
+    def __init__(self, size, image_shape, paths, mode, scale_factor, data_reduction, normalization, SAM_mode, brightness_factors) -> None:
         # Define the mode for the image holder
         self.mode = mode
 
@@ -127,6 +129,15 @@ class Image_Holder():
 
         # Define the data reduction factor
         self.data_reduction = data_reduction
+
+        # Define the image normalization technique
+        self.normalization = normalization
+        
+        # Define the brightness factors to be applied to the images
+        self.brightness_factors = brightness_factors
+
+        # Define the mode SAM will process the images
+        self.SAM_mode = SAM_mode
         
         # Define the HII and SNR region folder paths
         self.HII_folder_path = paths['HII_folder_path']
@@ -185,6 +196,8 @@ class Image_Holder():
         s += '\nImage crop size: ' + str(self.image_size_crop)
         s += '\nScale factor: ' + str(self.scale_factor)
         s += '\nData reduction: ' + str(self.data_reduction)
+        s += '\nNormalization: ' + self.normalization
+        s += '\nSAM mode: ' + self.SAM_mode
         count = 0.0
         if self.images[0].get_mask() is not None:
             s += '\nAverage mask count per image: ' + str(self.ave_masks()) + '\n'
@@ -240,14 +253,16 @@ class Image_Holder():
         count = self.data_reduction
         for file in self.HII_reg_files:
             if count % self.data_reduction == 0:
+                name = file.split('/')[-1].split('.')[0]
                 region = Regions.read(file, format='ds9')
-                imgs.append(Region_Image(region, 'HII', self.image_size_crop, self.image_size_full, self.scale_factor))
+                imgs.append(Region_Image(region, 'HII', self.image_size_crop, self.image_size_full, self.scale_factor, name))
             count += 1
         count = self.data_reduction
         for file in self.SNR_reg_files:
             if count % self.data_reduction == 0:
+                name = file.split('/')[-1].split('.')[0]
                 region = Regions.read(file, format='ds9')
-                imgs.append(Region_Image(region, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor))
+                imgs.append(Region_Image(region, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor, name))
             count += 1
         return imgs
 
@@ -299,6 +314,8 @@ class Image_Holder():
 
     # Define a function to generate and save the actual cropped image data (not just the boundaries) for each image in the holder.
     def generate_images(self):
+        new_images = []
+
         img_data = fits.getdata(self.image_path)[0][0]
         #img_data[np.isnan(img_data)] = -1
         
@@ -308,49 +325,64 @@ class Image_Holder():
             x2,y2 = curr_box['p2']
             img = np.array(img_data[y1:y2,x1:x2])
 
-            """ OLD WAY
+            if self.normalization == 'og':
+                # Normalize the image data
+                normalized_data = (img - img.min()) / (img.max() - img.min())
+                
+                # Create a new cropped image object duplicates with varyinng brightnesses
+                for bf in self.brightness_factors:
+                    new_img = copy.deepcopy(image)
 
-            # Normalize the image data
-            normalized_data = (img - img.min()) / (img.max() - img.min())
+                    # Update the brightness factor
+                    new_img.set_brightness_factor(bf)
 
-            # Convert the image to RGB
-            rgb_image = cv2.cvtColor(normalized_data, cv2.COLOR_GRAY2RGB)
+                    # Adjust the brightness by multiplying with the factor
+                    brightness_adjusted = normalized_data * bf
+                
+                    # Clip the pixel values to the valid range of [0, 1]
+                    brightness_adjusted = np.clip(brightness_adjusted, 0, 1)
 
-            # Convert the image to uint8
-            rgb_image_uint8 = (rgb_image * 255).astype(np.uint8)
+                    # Convert the adjusted grayscale image to RGB and unit8
+                    rgb_image = cv2.cvtColor((brightness_adjusted * 255).astype(np.uint8), cv2.COLOR_GRAY2RGB)
 
-            image.set_image(rgb_image_uint8)
-            """
+                    # Set the image
+                    new_img.set_image(rgb_image)
 
-            """ NEW WAY """
+                    # Add new image to the new image list
+                    new_images.append(new_img)
             
-            # Normalize the image data
-            normalized_data = (img - img.min()) / (img.max() - img.min())
+            else:
+            
+                # Normalize the image data
+                normalized_data = (img - img.min()) / (img.max() - img.min())
 
-            # Apply histogram equalization to enhance brightness
-            equalized_data = cv2.equalizeHist((normalized_data * 255).astype(np.uint8)) / 255
+                # Apply histogram equalization to enhance brightness
+                equalized_data = cv2.equalizeHist((normalized_data * 255).astype(np.uint8)) / 255
 
-            # Define brightness factor
-            brightness_factor = 1
+                # Create new cropped image object duplicates with varying brightnesses
+                for bf in self.brightness_factors:
+                    new_img = copy.deepcopy(image)
+                    
+                    # Update the brightness factor
+                    new_img.set_brightness_factor(bf)
 
-            # Adjust the brightness by multiplying with the factor
-            brightness_adjusted = equalized_data * brightness_factor
+                    # Adjust the brightness by multiplying with the factor
+                    brightness_adjusted = equalized_data * bf
 
-            # Clip the pixel values to the valid range of [0, 1]
-            brightness_adjusted = np.clip(brightness_adjusted, 0, 1)
+                    # Clip the pixel values to the valid range of [0, 1]
+                    brightness_adjusted = np.clip(brightness_adjusted, 0, 1)
 
-            # Convert the adjusted grayscale image to RGB
-            rgb_image = cv2.cvtColor((brightness_adjusted * 255).astype(np.uint8), cv2.COLOR_GRAY2RGB)
+                    # Convert the adjusted grayscale image to RGB and unit8
+                    rgb_image = cv2.cvtColor((brightness_adjusted * 255).astype(np.uint8), cv2.COLOR_GRAY2RGB)
 
-            # Convert the image to RGB
-            #rgb_image = cv2.cvtColor(brightness_adjusted, cv2.COLOR_GRAY2RGB)
+                    # Set the image
+                    new_img.set_image(rgb_image)
 
-            # Convert the image to uint8
-            #rgb_image_uint8 = (rgb_image * 255).astype(np.uint8)
-
-            # Set the image
-            image.set_image(rgb_image)
-
+                    # Add new image to the new image list
+                    new_images.append(new_img)
+        
+        # Save new images to image holder
+        self.images = new_images
 
     # Define a function to generate the corresponding annotation image from the region file
     #def generate_image_annotations(self):
@@ -444,7 +476,7 @@ class Image_Holder():
     # Define a function to save comparison plots of all images.
     # This function will create a new directory inside the provided path and save the images inside it.
     def save_plots(self, path, save_img):
-        full_path = path + '/' + self.mode + '_scale-' + str(self.scale_factor).replace('.','-') + '_maskcount-' + str(round(self.ave_masks(),5)).replace('.','-') + '/'
+        full_path = path + '/' + self.mode + '_' + self.SAM_mode + '_' + self.normalization + '_' + time.strftime("%Y%m%d-%H%M%S") + '/'
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         multi_mask_images = []
@@ -452,13 +484,13 @@ class Image_Holder():
         # Create pdf
         pdf = PdfPages(full_path + 'results.pdf')
         for image in tqdm(self.images):
-            image.generate_plot(full_path, save_img, pdf)
+            image.generate_plot(full_path, save_img, pdf, self.SAM_mode)
             if len(image.get_mask()) > 1:
                 multi_mask_images.append(image)
         pdf.close()
         print('Saved ' + full_path + 'results.pdf to file.')
         self.write_stats(full_path + 'stats.txt', multi_mask_images)
-
+        print('Saved ' + full_path + 'stats.txt to file.')
 
 
 
@@ -608,13 +640,16 @@ class Grid_Image(Cropped_Image):
 
 # Create a Region_Image child class.
 class Region_Image(Cropped_Image):
-    def __init__(self, region, file_type, crop_size, image_shape, scale_factor) -> None:
+    def __init__(self, region, file_type, crop_size, image_shape, scale_factor, name) -> None:
         # Define region parameters
         self.region = region
         self.Xs = region[0].vertices.x
         self.Ys = region[0].vertices.y
         poly = list(zip(self.Xs, self.Ys))
         cen = get_center(poly)
+        
+        # Define the name
+        self.name = name.upper()
 
         # Init super
         super().__init__(cen, file_type, crop_size, image_shape, polygon=poly)
@@ -640,6 +675,16 @@ class Region_Image(Cropped_Image):
         # Define the background SAM input points to assist segmentation
         #self.background_points = self.get_background_points()
     
+        # Define the brightness factor for this image. Default is 1
+        self.brightness_factor = 1.0
+
+    def get_name(self):
+        return self.name
+    def get_brightness_factor(self):
+        return self.brightness_factor
+    def set_brightness_factor(self, bf):
+        self.brightness_factor = bf
+
     # Define a function to return the bounding box of the region in an optimal form to pass into SAM
     def get_region_box_for_SAM(self):
         x1,y1 = self.transformed_region_box['p1']
@@ -660,11 +705,13 @@ class Region_Image(Cropped_Image):
         s += '\nTransformed region box: ' + str(self.transformed_region_box)
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
         s += '\nImage: ' + str(self.print_image())
+        s += '\nBrightness factor: ' + str(self.brightness_factor)
         s += '\nPolygon: ' + str(self.print_poly())
         s += '\nTransformed polygon: ' + str(pprint.pformat(self.transformed_polygon))
         s += '\nMask count: ' + str(self.get_mask_count())
         s += '\nMask: ' + str(self.print_mask())
         return s
+
     def get_radius(self):
         x,y = self.center
         x1,y1 = self.region_box['p1']
@@ -747,17 +794,18 @@ class Region_Image(Cropped_Image):
         return b
 
     # Define a function to generate and save plots to the corresponding file paths
-    def generate_plot(self, path, save_img, pdf):    
+    def generate_plot(self, path, save_img, pdf, SAM_mode):    
         dest_name = path + self.type + '_ID-' + str(self.get_id())
         
         # Determine if it is automatic SAM
-        if self.predict_scores is None:
+        if SAM_mode == 'auto':
             plt.subplots(figsize=(14,7))
-            chart_title = self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Mask Count: ' + str(len(self.mask))
+            chart_title = self.name + '   ' + self.type + '   Brightness: ' + str(self.brightness_factor) + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Mask Count: ' + str(len(self.mask))
             plt.suptitle(chart_title)
 
             plt.subplot(1,2,1)
             plt.imshow(self.image.copy())
+            plt.scatter(*zip(*self.transformed_polygon))
             plt.axis('On')
             plt.title('Source')
 
@@ -765,8 +813,6 @@ class Region_Image(Cropped_Image):
             plt.imshow(self.image)
             sorted_anns = sorted(self.mask.copy(), key=(lambda x: x['area']), reverse=True)
         
-            #plt.set_autoscale_on(False)
-
             img = np.ones((sorted_anns[0]['segmentation'].shape[0], sorted_anns[0]['segmentation'].shape[1], 4))
             img[:,:,3] = 0
             for ann in sorted_anns:
@@ -778,7 +824,6 @@ class Region_Image(Cropped_Image):
             plt.axis('On')
             plt.title('Segmented')
     
-            #plt.show()
             sname = dest_name + '.png'
             if save_img:
                 plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
@@ -789,7 +834,7 @@ class Region_Image(Cropped_Image):
             # Is Predictor SAM
             for i, (mask, score) in enumerate(zip(self.mask, self.predict_scores)):
                 plt.subplots(figsize=(14,7))
-                chart_title = self.type + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Score: '     + str(round(score, 3))
+                chart_title = self.name + '   ' + self.type + '   Brightness: ' + str(self.brightness_factor) + '\nCenter: ' + str(self.center) + '   Radius: ' + str(self.get_radius()) + '   Score: '     + str(round(score, 3))
                 plt.suptitle(chart_title)
 
                 plt.subplot(1,2,1)
@@ -804,11 +849,15 @@ class Region_Image(Cropped_Image):
                 x = self.get_image_center()
                 input_point = np.array([[x,x]])
                 input_label = np.array([1])
-                #show_points(input_point, input_label, plt.gca())
-                show_box(self.get_region_box_for_SAM(), plt.gca())
+                if SAM_mode == 'point':
+                    show_points(input_point, input_label, plt.gca())
+                elif SAM_mode == 'box':
+                    show_box(self.get_region_box_for_SAM(), plt.gca())
+                else:
+                    show_points(input_point, input_label, plt.gca())
+                    show_box(self.get_region_box_for_SAM(), plt.gca())
                 plt.title('Segmentation ' + str(i))
                 plt.axis('On')
-                #plt.show()
                 sname = dest_name + '_' + str(i) + '.png'
                 if save_img:
                     plt.savefig(sname, dpi='figure', bbox_inches='tight', pad_inches=0.1, facecolor='auto', edgecolor='auto')
