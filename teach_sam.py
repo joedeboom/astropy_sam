@@ -106,7 +106,7 @@ if __name__ == "__main__":
     brightness_factors = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
     brightness_factors = [0.5, 0.75, 1.0, 1.25, 1.5]
     #brightness_factors = [0.5, 1.0, 1.5]
-    #brightness_factors = [1.0]
+    brightness_factors = [1.0]
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data_reduction = 1 is the full data set).
@@ -175,15 +175,16 @@ if __name__ == "__main__":
 
 
     # Experiment with fits
-    hdul = fits.open(paths['image_path'])
-    hdul.info()
-
-    hdul.close()
+    #hdul = fits.open(paths['image_path'])
+    #hdul.info()
+    #hdul.close()
 
     print(image_holder)
 
 
-    # SAM ------------------------------------------------------------------------------------------------------
+
+    # SAM -----------------------------------------------------------------------------------------------------------------------------
+
     sam_checkpoint = 'sam_vit_h_4b8939.pth'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model_type = 'default'
@@ -198,27 +199,6 @@ if __name__ == "__main__":
     else:
         run_predict_SAM(sam, image_holder, SAM_mode)
 
-    """
-    print('Creating automatic mask generator...')
-    mask_generator = SamAutomaticMaskGenerator(sam)
-        #model=sam,
-        #points_per_side=32,
-        #pred_iou_thresh=0.9,
-        #stability_score_thresh=0.85,
-        #crop_n_layers=0,
-        #crop_n_points_downscale_factor=2,
-        #min_mask_region_area=100,  # Requires open-cv to run post-processing
-    #)
-    
-    print('\nGenerating masks...')
-    for cropped_image in tqdm(image_holder.get_images()):
-        img = cropped_image.get_image()
-        #img = img.astype(np.uint8)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        #img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)  # Convert to BGR if necessary
-        #img = cv2.convertScaleAbs(img)  # Convert to 8-bit format if necessary
-        cropped_image.set_mask(mask_generator.generate(img))
-    """
 
     print('Mask generation complete!')
     print(image_holder)
