@@ -155,6 +155,7 @@ if __name__ == "__main__":
     s += '\nScale factor: ' + str(scale_factor)
     s += '\nData reduction: ' + str(data_reduction)
     s += '\nNormalization: ' + normalization
+    s += '\nBrightness factors: ' + brightness_factors
     s += '\nSAM mode: ' + SAM_mode
     print(s)
 
