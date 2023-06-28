@@ -329,7 +329,7 @@ class Image_Holder():
                 # Normalize the image data
                 normalized_data = (img - img.min()) / (img.max() - img.min())
                 
-                # Create a new cropped image object duplicates with varyinng brightnesses
+                # Create new cropped image object duplicates with varying brightnesses
                 for bf in self.brightness_factors:
                     new_img = copy.deepcopy(image)
 
