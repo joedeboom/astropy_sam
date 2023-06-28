@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data_reduction = 1 is the full data set).
-    data_reduction = 500
+    data_reduction = 10
     
     # Define SAM mode
     # 'auto' will use automatic SAM masking.
