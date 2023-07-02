@@ -150,7 +150,7 @@ class Image_Holder():
         # Define the path to the full image
         self.image_path = paths['image_path']
         
-        # Check path  validity
+        # Check path validity
         self.check_paths()
 
         # Define the HII and SNR region files
@@ -162,7 +162,7 @@ class Image_Holder():
 
         # Define the list to hold the cropped image objects
         if mode == 'region':
-            self.images = self.finish_init_region2()
+            self.images = self.finish_init_region()
         elif mode == 'csv':
             self.images = self.finish_init_csv()
         elif mode == 'grid':
@@ -247,8 +247,7 @@ class Image_Holder():
 
     # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
     # This function computes the centers of each image via the region files.
-    # This is attempt 2
-    def finish_init_region2(self) -> list:
+    def finish_init_region(self) -> list:
         imgs = []
         count = self.data_reduction
         for file in self.HII_reg_files:
@@ -264,52 +263,6 @@ class Image_Holder():
                 region = Regions.read(file, format='ds9')
                 imgs.append(Region_Image(region, 'SNR', self.image_size_crop, self.image_size_full, self.scale_factor, name))
             count += 1
-        return imgs
-
-    # Define a function to finish the initialization of the image holder. Returns the full list of cropped image objects.
-    # This function computes the centers of each image via the region files.
-    def finish_init_region(self) -> list:
-        imgs = []
-        for file in self.HII_reg_files:
-            regions = Regions.read(file, format='ds9')
-            Xs = regions[0].vertices.x
-            Ys = regions[0].vertices.y
-            length = len(Xs)
-            left = float('inf')
-            right = float('-inf')
-            bot = float('inf')
-            top = float('-inf')
-            for i in range(length):
-                if Xs[i] > right:
-                    right = Xs[i]
-                if Xs[i] < left:
-                    left = Xs[i]
-                if Ys[i] < bot:
-                    bot = Ys[i]
-                if Ys[i] > top:
-                    top = Ys[i]
-            center = ((left + right) // 2, (top + bot) // 2)
-            imgs.append(Region_Image(center, 'HII', self.image_size_crop, self.image_size_full))
-        for file in self.SNR_reg_files:
-            regions = Regions.read(file, format='ds9')
-            Xs = regions[0].vertices.x
-            Ys = regions[0].vertices.y
-            length = len(Xs)
-            left = float('inf')
-            right = float('-inf')
-            bot = float('inf')
-            top = float('-inf')
-            for i in range(length):
-                if Xs[i] > right:
-                    right = Xs[i]
-                if Xs[i] < left:
-                    left = Xs[i]
-                if Ys[i] < bot:
-                    bot = Ys[i]
-                if Ys[i] > top:
-                    top = Ys[i]
-            center = ((left + right) // 2, (top + bot) // 2)
-            imgs.append(Region_Image(center, 'SNR', self.image_size_crop, self.image_size_full))
         return imgs
 
     # Define a function to generate and save the actual cropped image data (not just the boundaries) for each image in the holder.
@@ -521,7 +474,7 @@ class Cropped_Image():
         Cropped_Image.index += 1
 
         # Define where the image data is stored.
-        # The image data is generated each time it needs to be used via file path to the whole image
+        # The image data is generated at a later time via file path to the whole image
         self.image = None
 
         # Define the mask for the image
@@ -575,7 +528,12 @@ class Cropped_Image():
         else:
             return pprint.pformat(self.polygon)
     def __str__(self) -> str:
-        s = '\nID: ' + str(self.id) + '\nType: ' + self.type + '\nCenter: ' + str(self.center) + '\nBox: ' + str(self.box) + '\nSize of image: ' + str(sys.getsizeof(self.image)) + '\nMask: \n' + str(self.mask)
+        s = '\nID: ' + str(self.id)
+        s += '\nType: ' + self.type
+        s += '\nCenter: ' + str(self.center)
+        s += '\nBox: ' + str(self.box)
+        s += '\nSize of image: ' + str(sys.getsizeof(self.image))
+        s += '\nMask: \n' + str(self.mask)
         return s
     def set_image(self, img) -> None:
         self.image = img.copy()
@@ -655,6 +613,7 @@ class Region_Image(Cropped_Image):
         super().__init__(cen, file_type, crop_size, image_shape, polygon=poly)
         
         # Define the region box. This is the box the tightly bounds the region, not the boundary of the cropped image.
+        # These are the original coordinates on the full image.
         self.region_box = self.get_region_box()
 
         # Define the scale factor for the image radius
@@ -672,6 +631,7 @@ class Region_Image(Cropped_Image):
 
         # Define the transformed region box onto the cropped image
         self.transformed_region_box = self.get_transformed_region_box()
+        
         # Define the background SAM input points to assist segmentation
         #self.background_points = self.get_background_points()
     
@@ -748,7 +708,6 @@ class Region_Image(Cropped_Image):
         right = float('-inf')
         bot = float('inf')
         top = float('-inf')
-
         for point in self.polygon:
             x, y = point
             if x > right:
@@ -759,7 +718,6 @@ class Region_Image(Cropped_Image):
                 bot = y
             if y > top:
                 top = y
-
         b = {'p1':(int(left),int(bot)), 'p2':(int(right),int(top))}
         return b
         

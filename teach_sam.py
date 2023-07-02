@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data_reduction = 1 is the full data set).
-    data_reduction = 10
+    data_reduction = 500
     
     # Define SAM mode
     # 'auto' will use automatic SAM masking.
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     imageholder_save = 'imgholder_save.pkl'
 
     # Define if the program will run locally
-    local = False
+    local = True
 
     # Define data paths (for cloud)
     paths = {
@@ -155,7 +155,7 @@ if __name__ == "__main__":
     s += '\nScale factor: ' + str(scale_factor)
     s += '\nData reduction: ' + str(data_reduction)
     s += '\nNormalization: ' + normalization
-    s += '\nBrightness factors: ' + brightness_factors
+    s += '\nBrightness factors: ' + str(brightness_factors)
     s += '\nSAM mode: ' + SAM_mode
     print(s)
 
