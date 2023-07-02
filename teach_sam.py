@@ -18,15 +18,15 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 
 def run_auto_SAM(sam, image_holder):
     print('Creating automatic mask generator...')
-    mask_generator = SamAutomaticMaskGenerator(sam)
-        #model=sam,
-        #points_per_side=32,
-        #pred_iou_thresh=0.9,
-        #stability_score_thresh=0.85,
-        #crop_n_layers=0,
-        #crop_n_points_downscale_factor=2,
-        #min_mask_region_area=100,  # Requires open-cv to run post-processing
-    #)
+    mask_generator = SamAutomaticMaskGenerator(#sam)
+        model=sam,
+        points_per_side=64,
+        pred_iou_thresh=0.85,
+        stability_score_thresh=0.95,
+        crop_n_layers=1,
+        crop_n_points_downscale_factor=1,
+        min_mask_region_area=400,  # Requires open-cv to run post-processing
+    )
     print('\nGenerating masks...')
     for cropped_image in tqdm(image_holder.get_images()):
         img = cropped_image.get_image()
@@ -95,29 +95,29 @@ if __name__ == "__main__":
 
     # Define the radius scale factor.
     # If scale factor == 1, the default image size (defined above) will be used.
-    scale_factor = 2
+    scale_factor = 3
 
     # Define the image normalization technique. og or hist
     # 'og' will use my orginal normalization technique
     # 'hist' will use a histogram normalization technique
-    normalization = 'og'
+    normalization = 'hist'
 
     # Define the brightness factors to be applied to the images
     brightness_factors = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
     brightness_factors = [0.5, 0.75, 1.0, 1.25, 1.5]
-    #brightness_factors = [0.5, 1.0, 1.5]
-    brightness_factors = [1.0]
+    brightness_factors = [0.5, 1.0, 1.5]
+    #brightness_factors = [1.0]
 
     # Define the reduced dataset.
     # The dataset size will be reduced by the factor provided (data_reduction = 1 is the full data set).
-    data_reduction = 500
+    data_reduction = 50
     
     # Define SAM mode
     # 'auto' will use automatic SAM masking.
     # 'point' will use predictor SAM with input points
     # 'box' will use predictor SAM with input boxes
     # 'all' will use predictor SAM with input points and boxes.
-    SAM_mode = 'box'
+    SAM_mode = 'auto'
 
     # Define the image holder save name
     imageholder_save = 'imgholder_save.pkl'

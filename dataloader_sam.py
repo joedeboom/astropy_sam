@@ -666,8 +666,8 @@ class Region_Image(Cropped_Image):
         s += '\nSize of image: ' + str(sys.getsizeof(self.image))
         s += '\nImage: ' + str(self.print_image())
         s += '\nBrightness factor: ' + str(self.brightness_factor)
-        s += '\nPolygon: ' + str(self.print_poly())
-        s += '\nTransformed polygon: ' + str(pprint.pformat(self.transformed_polygon))
+        #s += '\nPolygon: ' + str(self.print_poly())
+        #s += '\nTransformed polygon: ' + str(pprint.pformat(self.transformed_polygon))
         s += '\nMask count: ' + str(self.get_mask_count())
         s += '\nMask: ' + str(self.print_mask())
         return s

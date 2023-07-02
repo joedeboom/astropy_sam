@@ -23,7 +23,7 @@ from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamP
 if __name__ == "__main__":
     
     # Define if program will run locally
-    local = False
+    local = True
 
     # Drive
     save_plots_folder_path = './astropy_sam/cropped_imgs'
